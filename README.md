@@ -24,14 +24,12 @@ python --version
 ```
 2. Install the following dependencies
 ```bash
-pip install numpy
-pip install botorch
-pip install matplotlib
-pip install pyyaml
-pip install hydra-core==0.11.3
-pip install nlopt==2.6.2
+pip install numpy botorch matplotlib pyyaml hydra-core==0.11.3 nlopt==2.6.2
 ```
-3. Extract the contents of `classified_regression.zip`, provided in the supplementary material, to your desired path <path/to/classified_regression>
+3. Clone this repository to your desired path:
+```bash
+git clone https://github.com/alonrot/classified_regression.git
+```
 4. Navigate to the package folder and install it
 ```bash
 cd <path/to/classified_regression>
@@ -48,7 +46,9 @@ python run_experiments.py
 
 The algorithm is initialized with two points, randomly sampled within the domain.
 
-Several verbose messages should be shown in the terminal, as the algorithm progresses. In addition, a plot similar to Fig. 2 in the paper should pop up, depicting the objective f, the constraint, the probability of constraint satifsfaction (omitted in the paper due to space constraints, but computable via eq. (9) in the paper), and the acquisition function (expected improvement with constraints).
+Several verbose messages should be shown in the terminal, as the algorithm progresses. In addition, a plot similar to Fig. 2 in the paper should pop up (see the figure below), depicting the objective f, the constraint, the probability of constraint satifsfaction (omitted in the paper due to space constraints, but computable via eq. (9) in the paper), and the acquisition function (expected improvement with constraints).
+
+![1D example](pic_1D_example.png)
 
 General comments
 ================
