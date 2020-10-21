@@ -1,0 +1,33 @@
+# # Configuration file for benchmark experiments
+# # ============================================
+
+## GP parameters
+gpcr_model:
+  hyperpars:
+    lenthscales: # The same hyperprior is assume for all lengthscales
+      prior: 'beta(a=2.0, b=6.0)' 
+    outputscale: 
+      prior: 'gamma(a=3.0, scale=2.0)'
+    threshold: 
+      prior: 'gamma(a=2.0,scale=1.0)' # Works: the optimal threshold stays right above both, when having only stable evaluaitions but also in the mixed case. But the range might be way too narrow ...
+      # prior: 'gamma(a=5.0,loc=0.0,scale=2.0)' # The range isn't narrow. However, when only having stable evaluations, the optimum is found too much above
+    noise_std: 
+      value: 0.01 # Homoscedastic noise, standard deviation
+    optimization:
+      Nrestarts: 1
+      algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+      Nmax_evals: 200 # Max number of function evaluations
+
+  ## Expectation propagation
+  ep:
+    maxiter: 15 # Stopping criterion: max number of EP iterations
+    prec: 1e-8 # Stopping criterion: relative precission in the logZ
+    verbo: False
+
+## Optimize acquisition function
+acquisition_function:
+  optimization:
+    Nrestarts: 10
+    algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+    disp_info_scipy_opti: False # Display info about the progress of the scipy optimizer
+  prob_satisfaction: 0.90 # User-defined probability threshold (TODO: Is this really needed?)

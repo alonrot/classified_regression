@@ -1,0 +1,101 @@
+# # Configuration file for benchmark experiments
+# # ============================================
+
+# ## Standard GP parameters
+# gpmodel:
+#   hyperpriors:
+#     lengthscales:
+#       which: "box"
+#       # which: "gamma"
+#       prior_box:
+#         lb: 0.01
+#         ub: 0.2
+#       prior_gamma:
+#         concentration: 1.0
+#         rate: 20.0
+#     outputscale:
+#       which: "gaussian"
+#       prior_gaussian:
+#         loc: 2.0
+#         scale: 10.0
+#     noise_std:
+#       value: 0.02 # Homoscedastic noise, standard deviation
+#     optimization:
+#       Nrestarts: 10
+#       # Nrestarts: 1
+
+## Standard GP parameters
+gpmodel:
+  hyperpars:
+    lenthscales: # The same hyperprior is assume for all lengthscales
+      # prior: 'beta(a=2.0, b=6.0)' # **Works**
+      prior: 'beta(a=1.5, b=15.0)' # Debug (shorter range for ls)
+    outputscale: 
+      prior: 'gamma(a=2.0, scale=1.0)'
+    noise_std: 
+      value: 0.01 # Homoscedastic noise, standard deviation
+    optimization:
+      Nrestarts: 8
+      # Nrestarts: 1
+      # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+      algo_name: 'LN_BOBYQA'
+      Nmax_evals: 200 # Max number of function evaluations
+  discard_too_close_points: False
+
+
+## GPCR parameters
+gpcr_model:
+  hyperpars:
+    lenthscales: # The same hyperprior is assume for all lengthscales
+      # prior: 'beta(a=2.0, b=6.0)' # **Works**
+      prior: 'beta(a=1.5, b=10.0)' # Debug (shorter range for ls)
+    outputscale: 
+      prior: 'gamma(a=3.0, scale=2.0)'
+    threshold: 
+      prior: 'gamma(a=2.0,scale=2.0)' # 
+      init: 0.0
+    noise_std: 
+      value: 0.01 # Homoscedastic noise, standard deviation
+    optimization:
+      Nrestarts: 8
+      # Nrestarts: 1
+      # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+      algo_name: 'LN_BOBYQA'
+      Nmax_evals: 200 # Max number of function evaluations
+  discard_too_close_points: False
+
+  ## Expectation propagation
+  ep:
+    maxiter: 15 # Stopping criterion: max number of EP iterations
+    prec: 1e-8 # Stopping criterion: relative precission in the logZ
+    verbo: False
+
+## Optimize acquisition function
+acquisition_function:
+  optimization:
+    Nrestarts: 10
+    # Nrestarts: 1
+    # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+    algo_name: 'LN_BOBYQA'
+    disp_info_scipy_opti: False # Display info about the progress of the scipy optimizer
+  prob_satisfaction: 0.90 # User-defined probability threshold (TODO: Is this really needed?)
+
+plot:
+  plotting: True
+  saving: False
+  path: "./plots/toy_example" # This will automatically be appended to ${hydra.run.dir} by hydra
+  block: False
+
+NBOiters: 100
+# NBOiters: 3
+which_objective: "branin2D"
+with_noise: True
+Ninit_points:
+  total: 1
+  safe:
+  unsafe:
+
+cost_heur_high: 350.0 # Tight upper bound on the function seems to be 308.1291
+cost_heur_low: 58.2957 # Value first evaluation -> Not lower because we would decrease the simple regret, thus favouring this case [0.6255, 0.5784]
+
+

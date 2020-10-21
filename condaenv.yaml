@@ -1,0 +1,34 @@
+name: classireg
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+  - gpytorch
+dependencies:
+  - python==3.7
+  - matplotlib
+  - pip:
+    - hydra-core
+    - botorch
+    - nlopt
+    - pyyaml
+    - joblib
+    - gym
+    - mujoco_py
+
+
+# git clone https://github.com/openai/spinningup.git
+# cd spinningup
+# pip install -e .
+
+# Mujoco:
+  # 1) Download it from https://www.roboti.us/index.html (mujoco200 macos)
+  # 2) Place the contents of the downloaded folder into /Users/alonrot/.mujoco/mujoco200
+  # 3) Place the key into /Users/alonrot/.mujoco
+  # 4) add this to ~/.bash_profile: export LD_LIBRARY_PATH=/Users/alonrot/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH            ~
+  # In linux:
+  # sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
+
+# conda env create -f condaenv.yaml
+
+

@@ -1,0 +1,14 @@
+Ninit = 0
+Nend 	= 100
+n_rep = $(Process) + $INT(Ninit)
+Nqueue = $(Nend) - $(Ninit)
+
+executable = /bin/bash
+arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EI_heur_low
+error = condor_EI_heur_low_$INT(n_rep).err
+output = condor_EI_heur_low_$INT(n_rep).out
+log = condor_EI_heur_low_$INT(n_rep).log
+getenv = true
+request_memory = 8000
+request_cpus = 1
+queue $(Nqueue)

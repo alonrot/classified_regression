@@ -1,0 +1,9 @@
+executable = /home/amarcovalle/.anaconda3/envs/classireg/bin/python
+n_rep = $(Process) + 0
+arguments = walker.py
+error = experiments_hart6D_EI_$INT(n_rep).err
+output = experiments_hart6D_EI_$INT(n_rep).out
+log = experiments_hart6D_EI_$INT(n_rep).log
+request_memory = 8000
+request_cpus = 1
+queue 1

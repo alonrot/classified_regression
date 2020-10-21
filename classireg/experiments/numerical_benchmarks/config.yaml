@@ -1,0 +1,35 @@
+hydra:
+  job_logging:
+    disable_existing_loggers: False
+  run:
+    dir: ./ # outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: "${which_objective}/EIC_results/cluster_data/.hydra"
+
+defaults:
+  - hydra/job_logging : disabled # Completely deactivate the hydra logging. NOTE: This solution should be documented, but it's not. See https://hydra.cc/docs/configure_hydra/logging
+  - config: simple1D
+  # - config: plotting1D # Not in the list ...
+  # - config: branin2D
+  # - config: hart6D
+  # - config: debug6D
+  # - config: micha10D
+  # - config: camel2D
+  # - config: eggs2D
+  # - config: quadruped8D
+  # - config: walker
+  # - config: shubert4D
+  # - scheme: debug
+  - scheme: normal
+  # optional: True
+
+run_type: "sequential" # {sequential,individual}
+# run_type: "individual"
+
+Ninit: 0
+Nend: 1
+rep_nr: 
+# acqui: "EIClassi"
+acqui: "EIC"
+# acqui: "EI"
+# acqui: "EI_heur_high"
+# acqui: "EI_heur_low"

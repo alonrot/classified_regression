@@ -1,0 +1,82 @@
+# # Configuration file for benchmark experiments
+# # ============================================
+
+## Standard GP parameters
+gpmodel:
+  hyperpars:
+    lenthscales: # The same hyperprior is assume for all lengthscales
+      # prior: 'beta(a=2.0, b=6.0)' # **Works**
+      prior: 'beta(a=1.5, b=10.0)' # Debug (shorter range for ls) (gamma, concentration: 2.0, rate: 0.5)
+    outputscale: 
+      prior: 'gamma(a=2.0, scale=0.25)' # from scipy.stats import gamma | gamma.rvs(a=2.0, scale=0.25,size=20)
+    noise_std: 
+      value: 0.01 # Homoscedastic noise, standard deviation
+    optimization:
+      Nrestarts: 6
+      # Nrestarts: 1
+      # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+      algo_name: 'LN_BOBYQA'
+      Nmax_evals: 200 # Max number of function evaluations
+  discard_too_close_points: False
+
+## GPCR parameters
+gpcr_model:
+  hyperpars:
+    lenthscales: # The same hyperprior is assume for all lengthscales
+      # prior: 'beta(a=2.0, b=6.0)' # **Works**
+      prior: 'beta(a=1.5, b=10.0)' # Debug (shorter range for ls)
+    outputscale: 
+      prior: 'gamma(a=2.0, scale=1.0)'
+    threshold: 
+      # prior: 'gamma(a=3.0,scale=1.0)' # Debug
+      prior: 'gamma(a=2.0,scale=1.0)' # **Works**: the optimal threshold stays right above both, when having only stable evaluaitions but also in the mixed case. But the range might be way too narrow ...
+      # prior: 'gamma(a=5.0,loc=0.0,scale=2.0)' # The range isn't narrow. However, when only having stable evaluations, the optimum is found too much above
+      init: 0.0
+    noise_std: 
+      value: 0.01 # Homoscedastic noise, standard deviation
+      # value: 0.1 # Homoscedastic noise, standard deviation
+    optimization:
+      Nrestarts: 4
+      algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+      Nmax_evals: 200 # Max number of function evaluations
+  discard_too_close_points: False
+
+  ## Expectation propagation
+  ep:
+    maxiter: 15 # Stopping criterion: max number of EP iterations
+    prec: 1e-8 # Stopping criterion: relative precission in the logZ
+    verbo: False
+
+## Optimize acquisition function
+acquisition_function:
+  optimization:
+    Nrestarts: 10
+    algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
+    disp_info_scipy_opti: False # Display info about the progress of the scipy optimizer
+  prob_satisfaction: 0.90 # User-defined probability threshold (TODO: Is this really needed?)
+
+plot:
+  plotting: True
+  saving: False
+  path: "./plots/toy_example_new" # This will automatically be appended to ${hydra.run.dir} by hydra
+  block: False
+  Ndiv: 201
+
+NBOiters: 5
+which_objective: "simple1D"
+Nrep: 1
+with_noise: False
+Ninit_points:
+  total: 
+  safe: 1
+  unsafe: 1
+
+
+safety_mechanisms:
+  use: True
+  load_from_file:
+    use: False
+    modify: False
+    nr_exp: "20200630001258"
+
+
