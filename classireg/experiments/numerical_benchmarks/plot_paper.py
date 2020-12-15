@@ -21,6 +21,8 @@ import hydra
 from omegaconf import DictConfig
 from botorch.models import ModelListGP
 import matplotlib.pyplot as plt
+from matplotlib import rc
+
 
 
 def get_init_evals_obj(eval_type=1):
@@ -45,6 +47,13 @@ def get_init_evals_cons(eval_type=1):
 
 @hydra.main(config_path="config.yaml")
 def main(cfg: DictConfig):
+
+	fontsize_labels = 35
+	rc('font', family='serif')
+	rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size': fontsize_labels})
+	rc('text', usetex=True)
+	rc('legend',fontsize=fontsize_labels)
+
 
 	dim = 1
 	train_x_obj, train_y_obj = get_init_evals_obj(eval_type=1)
@@ -75,8 +84,7 @@ def main(cfg: DictConfig):
 																				axes_GPcons_prob=None,axes_acqui=axes_acqui,cfg_plot=cfg.plot,
 																				xnext=x_next,alpha_next=alpha_next,plot_eta_c=False)
 
-
-	fontsize_labels = 35
+	
 	axes_GPobj.set_xticklabels([])
 	axes_GPobj.set_yticks([],[])
 	axes_GPobj.set_yticklabels([],[])
@@ -91,12 +99,18 @@ def main(cfg: DictConfig):
 	axes_acqui.set_yticks([],[])
 	axes_acqui.set_xticks([0.0,0.5,1.0])
 	axes_acqui.set_ylabel(r"$\alpha(x)$",fontsize=fontsize_labels)
-	axes_acqui.set_xlabel(r"x",fontsize=fontsize_labels)
+	axes_acqui.set_xlabel(r"$x$",fontsize=fontsize_labels)
 	plt.pause(0.5)
 
-	logger.info("Saving plot to {0:s} ...".format(cfg.plot.path))
-	hdl_fig.tight_layout()
-	plt.savefig(fname=cfg.plot.path,dpi=300,facecolor='w', edgecolor='w')
+	save_plot = False
+	# save_plot = True
+	if save_plot == True:
+		logger.info("Saving plot to {0:s} ...".format(cfg.plot.path))
+		hdl_fig.tight_layout()
+		plt.savefig(fname=cfg.plot.path,dpi=300,facecolor='w', edgecolor='w')
+	else:
+		plt.show(block=True)
+
 
 	# pdb.set_trace()
 
@@ -133,7 +147,7 @@ def main(cfg: DictConfig):
 	# prob_vec = eic.get_probability_of_safe_evaluation(xpred)
 	# axes_acqui.plot(xpred.cpu().detach().numpy(),prob_vec.cpu().detach().numpy())
 	# import matplotlib.pyplot as plt
-	plt.show(block=True)
+	# plt.show(block=True)
 
 if __name__ == "__main__":
 

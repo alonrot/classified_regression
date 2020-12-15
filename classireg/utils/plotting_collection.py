@@ -32,7 +32,7 @@ class PlotProbability:
 			color_mean = 'royalblue'
 			color_var 	= 'royalblue'
 			c_opti_color = "xkcd:orange"
-			markersize = 8
+			markersize = 10
 			lw_c_opti = 1.5
 			color_Xs = "black"
 			color_Xu = "black"
@@ -103,7 +103,7 @@ class PlotProbability:
 				Xu_level = np.zeros(len(X_uns))
 			else:
 				Xu_level = np.zeros(len(X_uns))
-			axes.plot(X_uns,Xu_level,marker="X",color=color_Xu,label="Unsafe evaluation(s)",markersize=1.5*markersize,linestyle="None")
+			axes.plot(X_uns,Xu_level,marker="X",color=color_Xu,label="Unsafe evaluation(s)",markersize=2.0*markersize,linestyle="None")
 		if x_bg is not None and m_bg is not None:
 			axes.plot(x_bg,m_bg,'mo',label="Global minimum (feasible)",markersize=markersize)
 		if c_opti is not None and plot_c_opti == True:
