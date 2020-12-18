@@ -7,12 +7,12 @@ hydra:
 
 defaults:
   - hydra/job_logging : disabled # Completely deactivate the hydra logging. NOTE: This solution should be documented, but it's not. See https://hydra.cc/docs/configure_hydra/logging
-  # - config: simple1D
+  - config: simple1D
   # - config: plotting1D # Not in the list ...
   # - config: branin2D
   # - config: hart6D
   # - config: debug6D
-  - config: micha10D
+  # - config: micha10D
   # - config: camel2D
   # - config: eggs2D
   # - config: quadruped8D

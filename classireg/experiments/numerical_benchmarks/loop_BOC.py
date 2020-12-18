@@ -257,18 +257,13 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
 
                 print("The constraint should get its own filed in the yaml file... (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
 
-                # Add threshold attribute?
+                # Compatibility with GPCR model - We add some attributes present in GPCRmodel but missing in GPmodel
                 gp_cons.threshold = torch.tensor([0.0])
                 gp_cons.train_ys = train_yl_cons[train_yl_cons[:,0] <= gp_cons.threshold,0]
                 gp_cons._identify_stable_close_to_unstable = lambda X_sta,X_uns,top_dist,verbosity: ([],[])
                 gp_cons.train_x_sorted = torch.tensor([])
                 gp_cons.train_x = train_x_cons_new.clone()
                 gp_cons.train_yl = train_yl_cons_new.clone()
-
-                # print("gp_cons.train_inputs:",gp_cons.train_inputs)
-                # print("gp_cons.train_targets:",gp_cons.train_targets)
-                # print("gp_obj.train_inputs:",gp_obj.train_inputs)
-                # print("gp_obj.train_targets:",gp_obj.train_targets)
 
             elif cfg.acqui == "EIC":
                 try:

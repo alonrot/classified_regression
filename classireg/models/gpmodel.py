@@ -1,5 +1,6 @@
 from botorch.models.gpytorch import GPyTorchModel
 from gpytorch.distributions import MultivariateNormal, MultitaskMultivariateNormal
+from torch.distributions import Normal
 from gpytorch.means import ConstantMean, ConstantMeanGrad, ZeroMean
 from gpytorch.models import ExactGP
 from gpytorch.kernels import RBFKernel, ScaleKernel, RBFKernelGrad, MaternKernel
@@ -242,7 +243,7 @@ class GPmodel(ExactGP, GPyTorchModel):
 		return mvn
 
 	def plot(self,axes=None,block=False,Ndiv=100,legend=True,title="GPgrad",plotting=True,plotCDF=False,clear_axes=False,Nsamples=None,ylabel=None,ylim=None,
-							pause=None,showtickslabels_x=True,color=None,prob=False):
+							pause=None,showtickslabels_x=True,color=None,prob=False,linewidth=None,labelsize=None,showtickslabels=False,showticks=False):
 		'''
 		This function hardcodes the plotting limits between zero and one for now
 		'''
@@ -251,7 +252,7 @@ class GPmodel(ExactGP, GPyTorchModel):
 
 		pp = PlotProbability()
 		xpred_vec = torch.linspace(0.0,1.0,Ndiv)[:,None]
-		xpred_vec = xpred_vec.unsqueeze(0) # Ndiv batches of [q=1 x self.dim] dimensions each
+		# xpred_vec = xpred_vec.unsqueeze(0) # Ndiv batches of [q=1 x self.dim] dimensions each
 
 		# Predict:
 		posterior = self.posterior(xpred_vec)
@@ -261,9 +262,12 @@ class GPmodel(ExactGP, GPyTorchModel):
 
 		# Posterior mean:
 		mean_vec = posterior.mean
+		std_vec = posterior.variance.sqrt()
 
 		if self.dim == 1:
-			axes = pp.plot_GP_1D(	xpred_vec=xpred_vec.squeeze().cpu().numpy(),
+
+			if prob == False:
+				axes = pp.plot_GP_1D(	xpred_vec=xpred_vec.squeeze().cpu().numpy(),
 														fpred_mode_vec=mean_vec.squeeze().detach().cpu().numpy(),
 														fpred_quan_minus=lower_ci.squeeze().detach().cpu().numpy(),
 														fpred_quan_plus=upper_ci.squeeze().detach().cpu().numpy(),
@@ -274,12 +278,27 @@ class GPmodel(ExactGP, GPyTorchModel):
 														labelsize="x-large",legend_loc="best",colormap="paper",
 														showtickslabels_x=showtickslabels_x)
 
-			if Nsamples is not None:
-				f_sample = posterior.sample(sample_shape=torch.Size([Nsamples]))
-				for k in range(Nsamples):
-					axes.plot(xpred_vec.squeeze().detach().cpu().numpy(),
-											f_sample[k,0,:,0],linestyle="--",linewidth=1.0,color="sienna")
-		
+				if Nsamples is not None:
+					f_sample = posterior.sample(sample_shape=torch.Size([Nsamples]))
+					for k in range(Nsamples):
+						axes.plot(xpred_vec.squeeze().detach().cpu().numpy(),
+												f_sample[k,0,:,0],linestyle="--",linewidth=1.0,color="sienna")
+			
+			else:
+
+				normal = Normal(loc=mean_vec.squeeze(), scale=std_vec.squeeze())
+				prob_cdf = normal.cdf(self.threshold)		
+				# pdb.set_trace()
+				axes = pp.plot_acquisition_function(var_vec=prob_cdf.detach().numpy(),xpred_vec=xpred_vec.numpy(),
+																			xlabel=None,ylabel=ylabel,title=title,legend=legend,axes=axes,clear_axes=True,
+																			xlim=np.array([0.,1.]),block=block,labelsize=labelsize,showtickslabels=showtickslabels,showticks=showticks,
+																			what2plot="",color=color,ylim=np.array([0.,1.1]),linewidth=linewidth)
+
+
+
+
+
+
 		elif self.dim == 2:
 			pass
 

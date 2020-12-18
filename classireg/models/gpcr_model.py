@@ -712,7 +712,7 @@ class GPCRmodel(BatchedMultiOutputGPyTorchModel,GP):
 		return self.predictive(x_in)
 
 	def plot(self,axes=None,block=False,Ndiv=100,legend=True,title="GPgrad",plotting=True,plotCDF=False,clear_axes=False,Nsamples=None,ylabel=None,ylim=None,
-							pause=None,showtickslabels_x=True,xlabel=None,labelsize=None,showtickslabels=None,showticks=None,linewidth=None,color=None,prob=False):
+							pause=None,showtickslabels_x=True,xlabel=None,labelsize=None,showtickslabels=False,showticks=None,linewidth=None,color=None,prob=False):
 		'''
 		This function hardcodes the plotting limits between zero and one for now
 		'''
