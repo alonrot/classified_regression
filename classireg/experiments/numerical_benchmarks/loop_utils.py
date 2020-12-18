@@ -128,7 +128,8 @@ def get_objective_functions(which_objective):
     if which_objective == "micha10D":
         dim = 10
         func_obj = Michalewicz10D(noise_std=0.01)
-        function_cons = ConsBallRegions(dim=dim,fac_=10.0)
+        # function_cons = ConsBallRegions(dim=dim,fac_=10.0)
+        function_cons = ConsBallRegions(dim=dim)
     if which_objective == "simple1D":
         func_obj = Simple1D()
         dim = 1

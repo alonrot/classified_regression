@@ -242,7 +242,7 @@ class GPmodel(ExactGP, GPyTorchModel):
 		return mvn
 
 	def plot(self,axes=None,block=False,Ndiv=100,legend=True,title="GPgrad",plotting=True,plotCDF=False,clear_axes=False,Nsamples=None,ylabel=None,ylim=None,
-							pause=None,showtickslabels_x=True):
+							pause=None,showtickslabels_x=True,color=None,prob=False):
 		'''
 		This function hardcodes the plotting limits between zero and one for now
 		'''

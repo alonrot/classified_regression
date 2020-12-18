@@ -6,7 +6,7 @@ import yaml
 import logging
 import shutil
 import pdb
-list_algo = ["EIC","EI","EI_heur_high","EI_heur_low","EIClassi"]
+list_algo = ["EIC","EI","EI_heur_high","EI_heur_low","EIClassi","EIC_standard"]
 np.set_printoptions(linewidth=1000)
 
 def print_list(list,name,usedim=False):
@@ -135,6 +135,8 @@ def display_banner(which_algo,Nrep,rep_nr):
 
 	if which_algo == "EIC":
 		algo_name = "Expected improvement with crash constraints (EIC**2) - Modeling the constraint with GPCR"
+	if which_algo == "EIC_standard":
+		algo_name = "Expected improvement with constraints (EIC) - Modeling the constraint with a standard GP"
 	if which_algo == "EIClassi":
 		algo_name = "Expected improvement with constraints (EIC) - Modeling the constraint with a GP classifier"
 	if which_algo == "EI":

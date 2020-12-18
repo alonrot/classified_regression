@@ -171,9 +171,9 @@ class ExpectedImprovementWithConstraints(AcquisitionBaseToolsConstrained,Constra
 
 		# Prevent from getting stuck into global minima:
 		close_points,_ = self.model_list.models[idxm["cons"]]._identify_stable_close_to_unstable(	X_sta=self.x_next.cpu().numpy(),
-																																															X_uns=self.model_list.models[idxm["cons"]].train_x_sorted.cpu().numpy(),
-																																															top_dist=math.sqrt(self.dim)*0.005,
-																																															verbosity=False)
+																									X_uns=self.model_list.models[idxm["cons"]].train_x_sorted.cpu().numpy(),
+																									top_dist=math.sqrt(self.dim)*0.005,
+																									verbosity=False)
 		if len(close_points) > 0:
 			logger.info("Changed the evaluation to random as it was very close to an existing evaluation, within math.sqrt(self.dim)*0.005 = {0:f}".format(math.sqrt(self.dim)*0.005))
 			self.x_next = draw_sobol_samples(bounds=torch.Tensor([[0.0]*self.dim,[1.0]*self.dim]),n=1,q=1).view(-1,self.dim)

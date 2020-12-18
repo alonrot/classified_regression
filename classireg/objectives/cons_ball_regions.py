@@ -8,7 +8,8 @@ dtype = torch.float32
 
 class ConsBallRegions(ObjectiveFunction):
 
-	def __init__(self,dim,noise_std=0.0,fac_=1.0):
+	# def __init__(self,dim,noise_std=0.0,fac_=1.0):
+	def __init__(self,dim,noise_std=0.0):
 		'''
 		g(x) = \prod_{i=1}^D sin(x_i) - t^(-D)
 		This function creates 2^(D-1) disjoint unsafe areas. When t = 0, the safe/unsafe areas become perfect hypercubes.
@@ -18,7 +19,7 @@ class ConsBallRegions(ObjectiveFunction):
 
 		super().__init__(dim=dim,noise_std=noise_std)
 
-		self.fac_ = fac_
+		# self.fac_ = fac_
 
 	def evaluate(self,x_in,with_noise=False):
 		'''
@@ -32,8 +33,9 @@ class ConsBallRegions(ObjectiveFunction):
 		# Evaluate function noiseless
 		f_out = torch.prod(torch.sin(x_in),axis=1)
 
-		# Rescale:
-		f_out *= 10*self.fac_
+		# # Rescale:
+		# f_out *= 10*self.fac_
+		f_out *= 10.0
 
 		# Add noise:
 		if with_noise == True:
@@ -44,11 +46,7 @@ class ConsBallRegions(ObjectiveFunction):
 		# Place -1.0 labels and INF to unstable values:
 		l_out = torch.ones(len(f_out))
 		l_out[y_out > 0.0] = -1
-		y_out[y_out > 0.0] = INF
-		# l_out[y_out >= 0.0] = -1
-		# y_out[y_out >= 0.0] = INF
-
-		y_out += 10.0 # DBG: REMOVE FTER
+		# y_out[y_out > 0.0] = INF # This is not strictly necessary as we always look at l_out to determine whether the point was safe/unsafe
 
 		return torch.cat([y_out.view(-1,1), l_out.view(-1,1)],dim=1)
 

@@ -7,12 +7,12 @@ hydra:
 
 defaults:
   - hydra/job_logging : disabled # Completely deactivate the hydra logging. NOTE: This solution should be documented, but it's not. See https://hydra.cc/docs/configure_hydra/logging
-  - config: simple1D
+  # - config: simple1D
   # - config: plotting1D # Not in the list ...
   # - config: branin2D
   # - config: hart6D
   # - config: debug6D
-  # - config: micha10D
+  - config: micha10D
   # - config: camel2D
   # - config: eggs2D
   # - config: quadruped8D
@@ -28,8 +28,9 @@ run_type: "sequential" # {sequential,individual}
 Ninit: 0
 Nend: 1
 rep_nr: 
-# acqui: "EIClassi"
-acqui: "EIC"
-# acqui: "EI"
-# acqui: "EI_heur_high"
-# acqui: "EI_heur_low"
+# acqui: "EIClassi" # Use expected improvement with constraints (EIC) with the constraint modeled as a GP classifier
+# acqui: "EIC" # Use EIC2, i.e., expected improvement with constraints (EIC) with the constraint modeled as GPCR
+acqui: "EIC_standard" # Use expected improvement with constraints (EIC) with the constraint modeled as standard GP
+# acqui: "EI" # Use expected improement (EI) with adaptive cost (AC)
+# acqui: "EI_heur_high" # Use expected improement (EI) with high cost (HC)
+# acqui: "EI_heur_low" # Use expected improement (EI) with middle cost (MC)

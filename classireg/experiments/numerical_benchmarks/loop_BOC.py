@@ -14,6 +14,7 @@ from classireg.models.gpmodel import GPmodel
 from classireg.models.gpcr_model import GPCRmodel
 from classireg.models.gpclassi_model import GPClassifier
 import yaml
+import traceback
 logger = get_logger(__name__)
 np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -109,8 +110,8 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
             logger.info("regret_simple_list:" + str(logvars["regret_simple_list"]))
             logger.info("threshold_list:" + str(logvars["threshold_list"]))
 
-            train_y_obj_mod = train_yl_cons[:,0]
-            train_y_obj_mod[train_y_obj_mod != float("Inf")] = train_y_obj[:]
+            # train_y_obj_mod = train_yl_cons[:,0]
+            # train_y_obj_mod[train_y_obj_mod != float("Inf")] = train_y_obj[:]
 
 
             # pdb.set_trace()
@@ -125,11 +126,27 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                                                                                         function_cons=function_cons,
                                                                                         cfg_Ninit_points=cfg.Ninit_points,
                                                                                         with_noise=cfg.with_noise)
+        else:
+            raise NotImplementedError("Make sure that all objectives can have access to the safety mechanisms and get rid of this")
 
     # pdb.set_trace()
     gp_obj = GPmodel(dim=dim, train_X=train_x_obj, train_Y=train_y_obj.view(-1), options=cfg.gpmodel)
     if cfg.acqui == "EIC":
         gp_cons = GPCRmodel(dim=dim, train_x=train_x_cons.clone(), train_yl=train_yl_cons.clone(), options=cfg.gpcr_model)
+    elif cfg.acqui == "EIC_standard":
+
+        gp_cons = GPmodel(dim=dim, train_X=train_x_cons.clone(), train_Y=train_yl_cons[:,0].clone(), options=cfg.gpmodel)
+
+        print("The constraint should get its own filed in the yaml file... (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
+
+        # Compatibility with GPCR model - We add some attributes present in GPCRmodel but missing in GPmodel
+        gp_cons.threshold = torch.tensor([0.0])
+        gp_cons.train_ys = train_yl_cons[train_yl_cons[:,0] <= gp_cons.threshold,0]
+        gp_cons.train_x = train_x_cons.clone()
+        gp_cons.train_yl = train_yl_cons.clone()
+        gp_cons._identify_stable_close_to_unstable = lambda X_sta,X_uns,top_dist,verbosity: ([],[])
+        gp_cons.train_x_sorted = torch.tensor([])
+
     elif cfg.acqui == "EIClassi":
         ind_safe = train_yl_cons[:,1] == +1
         train_yl_cons[ind_safe,1] = +1
@@ -137,7 +154,8 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
         gp_cons = GPClassifier(dim=dim, train_X=train_x_cons.clone(), train_Y=train_yl_cons[:,1].clone(), options=cfg.gpclassimodel)
 
 
-    if cfg.acqui == "EIC":
+
+    if cfg.acqui == "EIC" or cfg.acqui == "EIC_standard":
         constraints = {1: (None, gp_cons.threshold )}
         model_list = ModelListGP(gp_obj,gp_cons)
         eic = ExpectedImprovementWithConstraints(model_list=model_list, constraints=constraints, options=cfg.acquisition_function)
@@ -146,7 +164,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
         eic = ExpectedImprovementWithConstraintsClassi(dim=dim, model_list=model_list, options=cfg.acquisition_function)
 
     # pdb.set_trace()
-    if cfg.acqui == "EIC" and model_list.train_targets[0] is not None:
+    if (cfg.acqui == "EIC" or cfg.acqui == "EIC_standard") and model_list.train_targets[0] is not None:
         logvars["GPs"] = dict(  train_inputs=[train_inp[0] for train_inp in model_list.train_inputs],
                                 train_targets=[train_tar for train_tar in model_list.train_targets])
     elif cfg.acqui == "EIClassi" and model_list[0].train_targets is not None:
@@ -232,6 +250,26 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                 train_yl_cons_new[~ind_safe,1] = 0
 
                 gp_cons = GPClassifier(dim=dim, train_X=train_x_cons_new.clone(), train_Y=train_yl_cons_new[:,1].clone(), options=cfg.gpclassimodel)
+
+            elif cfg.acqui == "EIC_standard":
+
+                gp_cons = GPmodel(dim=dim, train_X=train_x_cons_new.clone(), train_Y=train_yl_cons_new[:,0].clone(), options=cfg.gpmodel)
+
+                print("The constraint should get its own filed in the yaml file... (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
+
+                # Add threshold attribute?
+                gp_cons.threshold = torch.tensor([0.0])
+                gp_cons.train_ys = train_yl_cons[train_yl_cons[:,0] <= gp_cons.threshold,0]
+                gp_cons._identify_stable_close_to_unstable = lambda X_sta,X_uns,top_dist,verbosity: ([],[])
+                gp_cons.train_x_sorted = torch.tensor([])
+                gp_cons.train_x = train_x_cons_new.clone()
+                gp_cons.train_yl = train_yl_cons_new.clone()
+
+                # print("gp_cons.train_inputs:",gp_cons.train_inputs)
+                # print("gp_cons.train_targets:",gp_cons.train_targets)
+                # print("gp_obj.train_inputs:",gp_obj.train_inputs)
+                # print("gp_obj.train_targets:",gp_obj.train_targets)
+
             elif cfg.acqui == "EIC":
                 try:
                     gp_cons = GPCRmodel(dim=dim, train_x=train_x_cons_new.clone(), train_yl=train_yl_cons_new.clone(), options=cfg.gpcr_model)
@@ -244,7 +282,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                     # gp_cons = GPCRmodel(dim=dim, train_x=gp_cons_train_x_backup, train_yl=gp_cons_train_yl_backup, options=cfg.gpcr_model) # Not needed! We keep the old one
                 
             # Update the model in other classes:
-            if cfg.acqui == "EIC":
+            if cfg.acqui == "EIC" or cfg.acqui == "EIC_standard":
                 constraints = {1: (None, gp_cons.threshold)}
                 model_list = ModelListGP(gp_obj,gp_cons)
                 eic = ExpectedImprovementWithConstraints(model_list=model_list, constraints=constraints, options=cfg.acquisition_function)
@@ -273,6 +311,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
 
     except Exception as inst:
         logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
+        traceback.print_exc()
         msg_bo_final = " <<< {0:s} failed (!) at iteration {1:d} / {2:d} >>>".format(cfg.acqui,trial+1,cfg.NBOiters)
     else:
         msg_bo_final = " <<< {0:s} finished successfully!! >>>".format(cfg.acqui)

@@ -75,4 +75,11 @@ cost_heur_high: 10.0 # Loose upper bound on the function seems to be 10.0
 cost_heur_low: -0.9046 # Value first evaluation -> Not lower because we would decrease the simple regret, thus favouring this case [0.7139, 0.6342, 0.2331, 0.8299, 0.7615, 0.8232, 0.9008, 0.1899, 0.6961, 0.3240]
 
 
+safety_mechanisms:
+  use: True
+  load_from_file:
+    use: False
+    modify: False
+    nr_exp: ""
+
 

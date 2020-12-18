@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dtype = torch.float32
-list_algo = ["EIC","EI","EI_heur_high","EI_heur_low","EIClassi"]
+list_algo = ["EIC","EI","EI_heur_high","EI_heur_low","EIClassi","EIC_standard"]
 
 @hydra.main(config_path="config.yaml")
 def main(cfg: DictConfig) -> None:
@@ -22,7 +22,7 @@ def main(cfg: DictConfig) -> None:
 
     print(cfg.pretty())
 
-    if cfg.acqui == "EIC" or cfg.acqui == "EIClassi":
+    if cfg.acqui == "EIC" or cfg.acqui == "EIClassi" or cfg.acqui == "EIC_standard":
         from classireg.experiments.numerical_benchmarks.loop_BOC import run
     if cfg.acqui == "EI" or cfg.acqui == "EI_heur_high" or cfg.acqui == "EI_heur_low":
         from classireg.experiments.numerical_benchmarks.loop_BO  import run
