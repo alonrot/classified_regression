@@ -4,7 +4,7 @@ n_rep = $(Process) + $INT(Ninit)
 Nqueue = $(Nend) - $(Ninit)
 
 executable = /bin/bash
-arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EIC_standard 20201219174639
+arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EIC_standard 20201219193426
 error = condor_EIC_standard_$INT(n_rep).err
 output = condor_EIC_standard_$INT(n_rep).out
 log = condor_EIC_standard_$INT(n_rep).log
