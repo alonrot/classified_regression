@@ -53,7 +53,8 @@ gpmodel_cons:
       # prior: 'beta(a=2.0, b=6.0)' # **Works**
       prior: 'beta(a=1.5, b=15.0)' # Debug (shorter range for ls)
     outputscale: 
-      prior: 'gamma(a=1.5, scale=0.1)'
+      # prior: 'gamma(a=1.5, scale=0.1)'
+      prior: 'gamma(a=2.0, scale=2.0)'
     noise_std: 
       value: 0.01 # Homoscedastic noise, standard deviation
     optimization:
