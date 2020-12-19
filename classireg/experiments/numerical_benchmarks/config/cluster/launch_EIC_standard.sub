@@ -1,5 +1,5 @@
 Ninit = 0
-Nend 	= 100
+Nend 	= 5
 n_rep = $(Process) + $INT(Ninit)
 Nqueue = $(Nend) - $(Ninit)
 
