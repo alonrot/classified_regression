@@ -76,13 +76,13 @@ Ninit_points:
 cost_heur_high: 0.0 # Tight upper bound on the function seems to be -2.0232
 cost_heur_low: -60.6966 # Value first evaluation -> Not lower because we would decrease the simple regret, thus favouring this case [0.5578, 0.0558]
 
-safety_mechanisms:
-  use: True # [DO NOT SET THIS TO FALSE] Set this to True if we want the data to be saved at each iteration
-  load_from_file:
-    use: True
-    modify: False
-    # nr_exp: "20200723160313"
-    # nr_exp: "20200727111325"
-    nr_exp: "20200729142504"
+# safety_mechanisms:
+#   use: True # [DO NOT SET THIS TO FALSE] Set this to True if we want the data to be saved at each iteration
+#   load_from_file:
+#     use: True
+#     modify: False
+#     # nr_exp: "20200723160313"
+#     # nr_exp: "20200727111325"
+#     nr_exp: "20200729142504"
 
 

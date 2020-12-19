@@ -30,117 +30,108 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
     function_obj, function_cons, dim, x_min, f_min = get_objective_functions(which_objective=cfg.which_objective)
     
     logvars = initialize_logging_variables()
-    if "safety_mechanisms" in cfg.keys():
 
-        if cfg.safety_mechanisms.use and cfg.safety_mechanisms.load_from_file.use:
+    if cfg.safety_mechanisms.load_from_file.use:
 
-            nr_exp = cfg.safety_mechanisms.load_from_file.nr_exp
-            path2data = "./{0:s}/{1:s}_results/{2:s}".format(cfg.which_objective,cfg.acqui,nr_exp)
-            try:
-                with open("{0:s}/data_0.yaml".format(path2data), "r") as stream:
-                    my_node = yaml.load(stream,Loader=yaml.UnsafeLoader)
-            except Exception as inst:
-                logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
-                raise ValueError("Data corrupted or non-existent!!!")
-            else:
-                logger.info("We have lodaded existing data from {0:s}".format(path2data))
-                logger.info("A quick inspection reveals {0:d} existing datapoint(s) ...".format(len(my_node["regret_simple_array"])))
+        nr_exp = cfg.safety_mechanisms.load_from_file.nr_exp
+        path2data = "./{0:s}/{1:s}_results/{2:s}".format(cfg.which_objective,cfg.acqui,nr_exp)
+        try:
+            with open("{0:s}/data_0.yaml".format(path2data), "r") as stream:
+                my_node = yaml.load(stream,Loader=yaml.UnsafeLoader)
+        except Exception as inst:
+            logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
+            raise ValueError("Data corrupted or non-existent!!!")
+        else:
+            logger.info("We have lodaded existing data from {0:s}".format(path2data))
+            logger.info("A quick inspection reveals {0:d} existing datapoint(s) ...".format(len(my_node["regret_simple_array"])))
 
-            if cfg.safety_mechanisms.load_from_file.modify:
-                logger.info("Here, we have the opportunity of modifying some data, if needed...")
-                pdb.set_trace()
+        if cfg.safety_mechanisms.load_from_file.modify:
+            logger.info("Here, we have the opportunity of modifying some data, if needed...")
+            pdb.set_trace()
 
+        # pdb.set_trace()
+        # Get stored values:
+        if my_node["GPs"][0]["train_inputs"] is not None:
+            train_x_obj = torch.from_numpy(my_node["GPs"][0]["train_inputs"]).to(device=device,dtype=dtype)
+        else:
+            train_x_obj = [torch.tensor([])]
+        if my_node["GPs"][0]["train_targets"] is not None:
+            train_y_obj = torch.from_numpy(my_node["GPs"][0]["train_targets"]).to(device=device,dtype=dtype)
+        else:
+            train_y_obj = torch.tensor([])
 
-            # pdb.set_trace()
-            # Get stored values:
-            if my_node["GPs"][0]["train_inputs"] is not None:
-                train_x_obj = torch.from_numpy(my_node["GPs"][0]["train_inputs"]).to(device=device,dtype=dtype)
-            else:
-                train_x_obj = [torch.tensor([])]
-            if my_node["GPs"][0]["train_targets"] is not None:
-                train_y_obj = torch.from_numpy(my_node["GPs"][0]["train_targets"]).to(device=device,dtype=dtype)
-            else:
-                train_y_obj = torch.tensor([])
-
-            train_x_cons = torch.from_numpy(my_node["GPs"][1]["train_inputs"]).to(device=device,dtype=dtype)
+        # pdb.set_trace()
+        train_x_cons = torch.from_numpy(my_node["GPs"][1]["train_inputs"]).to(device=device,dtype=dtype)
+        if "train_yl_cons" in my_node["GPs"][1].keys():
+            train_yl_cons = my_node["GPs"][1]["train_yl_cons"].to(device=device,dtype=dtype)
+        else:
             train_yl_cons = torch.from_numpy(my_node["GPs"][1]["train_targets"]).to(device=device,dtype=dtype)
 
-            logger.info("train_x_cons:" + str(train_x_cons))
-            logger.info("train_x_cons.shape:" + str(train_x_cons.shape))
+        logger.info("==============================================")
+        logger.info("train_x_obj:" + str(train_x_obj))
+        logger.info("train_x_obj.shape:" + str(train_x_obj.shape))
+        logger.info("train_y_obj:" + str(train_y_obj))
+        logger.info("train_y_obj.shape:" + str(train_y_obj.shape))
+        logger.info("==============================================")
+        logger.info("")
 
-            # # If we need to convert something, do it here:
-            # train_x_obj[:,2:4] = train_x_obj[:,2:4]*(0.08-0.03)/(0.14-0.03)
-            # train_x_cons[:,2:4] = train_x_cons[:,2:4]*(0.08-0.03)/(0.14-0.03)
+        logger.info("==============================================")
+        logger.info("train_x_cons:" + str(train_x_cons))
+        logger.info("train_x_cons.shape:" + str(train_x_cons.shape))
+        logger.info("train_yl_cons:" + str(train_yl_cons))
+        logger.info("train_yl_cons.shape:" + str(train_yl_cons.shape))
+        logger.info("==============================================")
+        logger.info("")
 
+        # Get logvars so far:
+        logvars["regret_simple_list"] = np.ndarray.tolist(my_node["regret_simple_array"])
+        logvars["regret_simple_list"] = [np.array([el]) for el in logvars["regret_simple_list"]]
+        logvars["threshold_list"] = np.ndarray.tolist(my_node["threshold_array"])
+        logvars["threshold_list"] = [np.array([el]) for el in logvars["threshold_list"]]
+        logvars["x_next_list"] = np.ndarray.tolist(my_node["x_next_array"])
+        logvars["x_next_list"] = [np.array(el) for el in logvars["x_next_list"]]
 
-            # # Mods 27 Jul 12:43:
-            # train_x_obj = train_x_obj[0:-1,:] # kick out last value from f(x)
-            # train_y_obj = train_y_obj[0:-1] # kick out last value from f(x)
-            # # train_x_cons # stays the same g(x)
-            # train_yl_cons[-1,0] = float("Inf") # Make the last point of g(x) a failure
-            # train_yl_cons[-1,1] = -1.0 # Make the last point of g(x) a failure
+        # Report of data so far:
+        logger.info("Quick report on data collected so far")
+        logger.info("=====================================")
+        logger.info("regret_simple_list:" + str(logvars["regret_simple_list"]))
+        logger.info("threshold_list:" + str(logvars["threshold_list"]))
 
-            # # Mods 29 Jul 12:43:
-            train_x_obj[:,0:2] = train_x_obj[:,0:2]*(4.0-1.5)/(5.0-1.5)
-            train_x_cons[:,0:2] = train_x_cons[:,0:2]*(4.0-1.5)/(5.0-1.5)
-            logger.info("after conversion....")
+        # Initial iteration:
+        trial_init = train_yl_cons.shape[0]
 
-            logger.info("train_x_cons:" + str(train_x_cons))
-            logger.info("train_x_cons.shape:" + str(train_x_cons.shape))
+    else:
 
-            # Get best:
-            ind_min_cost = torch.argmin(train_y_obj)
-            train_x_obj_min = train_x_obj[ind_min_cost,:]
-            print("train_x_obj_min:",train_x_obj_min)
-            print("train_y_obj_min:",train_y_obj[ind_min_cost])
+        train_x_obj, train_y_obj, train_x_cons, train_yl_cons = get_initial_evaluations(which_objective=cfg.which_objective,
+                                                                                    function_obj=function_obj,
+                                                                                    function_cons=function_cons,
+                                                                                    cfg_Ninit_points=cfg.Ninit_points,
+                                                                                    with_noise=cfg.with_noise)
 
-            # pdb.set_trace()
-
-            # Get logvars so far:
-            logvars["regret_simple_list"] = np.ndarray.tolist(my_node["regret_simple_array"])
-            logvars["regret_simple_list"] = [np.array([el]) for el in logvars["regret_simple_list"]]
-            logvars["threshold_list"] = np.ndarray.tolist(my_node["threshold_array"])
-            logvars["threshold_list"] = [np.array([el]) for el in logvars["threshold_list"]]
-            logvars["x_next_list"] = np.ndarray.tolist(my_node["x_next_array"])
-            logvars["x_next_list"] = [np.array(el) for el in logvars["x_next_list"]]
-
-            # Report of data so far:
-            logger.info("Quick report on data collected so far")
-            logger.info("=====================================")
-            logger.info("regret_simple_list:" + str(logvars["regret_simple_list"]))
-            logger.info("threshold_list:" + str(logvars["threshold_list"]))
-
-            # train_y_obj_mod = train_yl_cons[:,0]
-            # train_y_obj_mod[train_y_obj_mod != float("Inf")] = train_y_obj[:]
+        # Initial iteration:
+        trial_init = 0
 
 
-            # pdb.set_trace()
+    # Save data in a new location:
+    my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
+    path2data = generate_folder_at_path(my_path,create_folder=True)
 
-        elif cfg.safety_mechanisms.use:
-
-            my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
-            path2data = generate_folder_at_path(my_path,create_folder=True)
-
-            train_x_obj, train_y_obj, train_x_cons, train_yl_cons = get_initial_evaluations(which_objective=cfg.which_objective,
-                                                                                        function_obj=function_obj,
-                                                                                        function_cons=function_cons,
-                                                                                        cfg_Ninit_points=cfg.Ninit_points,
-                                                                                        with_noise=cfg.with_noise)
-        else:
-            raise NotImplementedError("Make sure that all objectives can have access to the safety mechanisms and get rid of this")
-
+    # ------------------
+    # Initialize models:
+    # ------------------
     # pdb.set_trace()
     gp_obj = GPmodel(dim=dim, train_X=train_x_obj, train_Y=train_y_obj.view(-1), options=cfg.gpmodel)
     if cfg.acqui == "EIC":
         gp_cons = GPCRmodel(dim=dim, train_x=train_x_cons.clone(), train_yl=train_yl_cons.clone(), options=cfg.gpcr_model)
+
     elif cfg.acqui == "EIC_standard":
 
-        gp_cons = GPmodel(dim=dim, train_X=train_x_cons.clone(), train_Y=train_yl_cons[:,0].clone(), options=cfg.gpmodel)
+        # pdb.set_trace()
 
-        print("The constraint should get its own filed in the yaml file... (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
+        gp_cons = GPmodel(dim=dim, train_X=train_x_cons.clone(), train_Y=train_yl_cons[:,0].clone(), options=cfg.gpmodel_cons, which_type="cons")
 
         # Compatibility with GPCR model - We add some attributes present in GPCRmodel but missing in GPmodel
-        gp_cons.threshold = torch.tensor([0.0])
+        gp_cons.threshold = torch.tensor([cfg.gpmodel_cons.threshold])
         gp_cons.train_ys = train_yl_cons[train_yl_cons[:,0] <= gp_cons.threshold,0]
         gp_cons.train_x = train_x_cons.clone()
         gp_cons.train_yl = train_yl_cons.clone()
@@ -154,7 +145,9 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
         gp_cons = GPClassifier(dim=dim, train_X=train_x_cons.clone(), train_Y=train_yl_cons[:,1].clone(), options=cfg.gpclassimodel)
 
 
-
+    # -------------------------------------
+    # Initialize acquisition function class
+    # -------------------------------------
     if cfg.acqui == "EIC" or cfg.acqui == "EIC_standard":
         constraints = {1: (None, gp_cons.threshold )}
         model_list = ModelListGP(gp_obj,gp_cons)
@@ -179,8 +172,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                                                                                     axes_GPcons_prob=None,axes_acqui=None,cfg_plot=cfg.plot)
 
     try:
-    # average over multiple trials
-        for trial in range(cfg.NBOiters):
+        for trial in range(trial_init,cfg.NBOiters):
             
             msg_bo_iters = " <<< BOC Iteration {0:d} / {1:d} >>>".format(trial+1,cfg.NBOiters)
             print("\n\n")
@@ -253,12 +245,10 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
 
             elif cfg.acqui == "EIC_standard":
 
-                gp_cons = GPmodel(dim=dim, train_X=train_x_cons_new.clone(), train_Y=train_yl_cons_new[:,0].clone(), options=cfg.gpmodel)
-
-                print("The constraint should get its own filed in the yaml file... (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
+                gp_cons = GPmodel(dim=dim, train_X=train_x_cons_new.clone(), train_Y=train_yl_cons_new[:,0].clone(), options=cfg.gpmodel_cons, which_type="cons")
 
                 # Compatibility with GPCR model - We add some attributes present in GPCRmodel but missing in GPmodel
-                gp_cons.threshold = torch.tensor([0.0])
+                gp_cons.threshold = torch.tensor([cfg.gpmodel_cons.threshold])
                 gp_cons.train_ys = train_yl_cons[train_yl_cons[:,0] <= gp_cons.threshold,0]
                 gp_cons._identify_stable_close_to_unstable = lambda X_sta,X_uns,top_dist,verbosity: ([],[])
                 gp_cons.train_x_sorted = torch.tensor([])
@@ -288,21 +278,22 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
 
             logvars["GPs"] = [gp_obj.logging(), gp_cons.logging()]
 
+            if cfg.acqui == "EIC_standard":
+                logvars["GPs"][1].update({"train_yl_cons": gp_cons.train_yl})
 
-            if "safety_mechanisms" in cfg.keys():
-                if cfg.safety_mechanisms.use:
-                    node2write = convert_lists2arrays(logvars)
-                    node2write["n_rep"] = rep_nr
-                    node2write["ycm"] = f_min
-                    node2write["xcm"] = x_min
-                    # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
+            # Automatically save:
+            node2write = convert_lists2arrays(logvars)
+            node2write["n_rep"] = rep_nr
+            node2write["ycm"] = f_min
+            node2write["xcm"] = x_min
+            # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
 
-                    file2save = "{0:s}/data_0.yaml".format(path2data)
-                    logger.info("Saving while optimizing. Iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))
-                    logger.info("Saving in {0:s} ...".format(file2save))
-                    with open(file2save, "w") as stream_write:
-                        yaml.dump(node2write, stream_write)
-                    logger.info("Done!")
+            file2save = "{0:s}/data_0.yaml".format(path2data)
+            logger.info("Saving while optimizing. Iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))
+            logger.info("Saving in {0:s} ...".format(file2save))
+            with open(file2save, "w") as stream_write:
+                yaml.dump(node2write, stream_write)
+            logger.info("Done!")
 
     except Exception as inst:
         logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
@@ -321,5 +312,4 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
     node2write["xcm"] = x_min
     # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
 
-    if "safety_mechanisms" in cfg.keys() and cfg.safety_mechanisms.use == False:
-        save_data(node2write=node2write,which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=rep_nr)
+    save_data(node2write=node2write,which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=rep_nr)

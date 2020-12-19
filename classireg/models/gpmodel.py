@@ -47,7 +47,11 @@ class GPmodel(ExactGP, GPyTorchModel):
 			self._validate_tensor_args(X=train_X, Y=train_Y[:,None]) # Only for this function, train_Y must be 2D (this must be a bug in botorch)
 
 		print("\n")
-		logger.info("### Initializing GP model for objective f(x) ###")
+		self.which_type = which_type
+		if which_type == "cons":
+			logger.info("### Initializing GP model for constraint g(x) ###")
+		else:
+			logger.info("### Initializing GP model for objective f(x) ###")
 
 		# Likelihood:
 		noise_std = options.hyperpars.noise_std.value
@@ -150,8 +154,13 @@ class GPmodel(ExactGP, GPyTorchModel):
 
 		self.train()
 
-		logger.info("Fitting GP model f(x) ...")
+		if self.which_type == "cons":
+			logger.info("Fitting GP model for constraint g(x) ...")
+		else:
+			logger.info("Fitting GP model for objective f(x) ...")
 		logger.info("-------------------------")
+
+
 
 		# Get random restarts:
 		x_restarts = self._sample_hyperparameters_within_bounds(Nsamples=Nrestarts)

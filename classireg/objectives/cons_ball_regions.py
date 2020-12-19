@@ -35,7 +35,7 @@ class ConsBallRegions(ObjectiveFunction):
 
 		# # Rescale:
 		# f_out *= 10*self.fac_
-		f_out *= 10.0
+		# f_out *= 10.0
 
 		# Add noise:
 		if with_noise == True:
