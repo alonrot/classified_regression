@@ -18,8 +18,8 @@ defaults:
   # - config: quadruped8D
   # - config: walker
   # - config: shubert4D
-  - scheme: debug
-  # - scheme: normal
+  # - scheme: debug
+  - scheme: normal
   # optional: True
 
 run_type: "sequential" # {sequential,individual}
