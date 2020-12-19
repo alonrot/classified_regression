@@ -15,18 +15,20 @@ from classireg.models.gpcr_model import GPCRmodel
 from classireg.models.gpclassi_model import GPClassifier
 import yaml
 import traceback
+import time
 logger = get_logger(__name__)
 np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dtype = torch.float32
 
-
-
-def run(cfg: DictConfig, rep_nr: int) -> None:
+def run(cfg: DictConfig, rep_nr: int, path2data=None) -> None:
 
     # Random seed for numpy and torch:
     np.random.seed(rep_nr)
     torch.manual_seed(rep_nr)
+
+    # Delay the execution by a tiny amount of time to avoid collisions:
+    time.sleep(rep_nr/50.)
 
     # Load true function and initial evaluations:
     function_obj, function_cons, dim, x_min, f_min = get_objective_functions(which_objective=cfg.which_objective)
@@ -109,14 +111,14 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                                                                                     function_cons=function_cons,
                                                                                     cfg_Ninit_points=cfg.Ninit_points,
                                                                                     with_noise=cfg.with_noise)
-
         # Initial iteration:
         trial_init = 0
 
 
     # Save data in a new location:
-    my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
-    path2data = generate_folder_at_path(my_path,create_folder=True)
+    if path2data is None:
+        my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
+        path2data = generate_folder_at_path(my_path,create_folder=True)
 
     # ------------------
     # Initialize models:
@@ -290,7 +292,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
             node2write["xcm"] = x_min
             # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
 
-            file2save = "{0:s}/data_0.yaml".format(path2data)
+            file2save = "{0:s}/data_{1:d}.yaml".format(path2data,rep_nr)
             logger.info("Saving while optimizing. Iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))
             logger.info("Saving in {0:s} ...".format(file2save))
             with open(file2save, "w") as stream_write:
@@ -307,11 +309,14 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
     logger.info("="*len(msg_bo_final))
     logger.info("{0:s}".format(msg_bo_final))
     logger.info("="*len(msg_bo_final))
+    logger.info("All data was saved during optimization in {0:s}".format(file2save))
+    logger.info("Final iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))
 
-    node2write = convert_lists2arrays(logvars)
-    node2write["n_rep"] = rep_nr
-    node2write["ycm"] = f_min
-    node2write["xcm"] = x_min
-    # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
+    # node2write = convert_lists2arrays(logvars)
+    # node2write["n_rep"] = rep_nr
+    # node2write["ycm"] = f_min
+    # node2write["xcm"] = x_min
+    # # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
 
-    save_data(node2write=node2write,which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=rep_nr)
+    # save_data(node2write=node2write,which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=rep_nr)
+        

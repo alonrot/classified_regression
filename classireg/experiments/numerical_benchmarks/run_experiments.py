@@ -46,7 +46,12 @@ def main(cfg: DictConfig) -> None:
 
         display_banner(cfg.acqui,cfg.Nend,cfg.rep_nr+1)
         try:
-            run(cfg, cfg.rep_nr)
+
+            # Create the folder only once and here:
+            my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
+            path2data = generate_folder_at_path(my_path,create_folder=True)
+
+            run(cfg, cfg.rep_nr, path2data)
         except Exception as inst:
             logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
             traceback.print_exc()

@@ -23,9 +23,9 @@ def generate_folder_at_path(my_path,create_folder=True):
 
 	if create_folder == True:
 		# os.mkdir(path2folder)
-		os.makedirs(path2folder)
-
-
+		os.makedirs(path2folder,exist_ok=False) # When exist_ok=False (default), an exception is raised if the directory already exists
+												# When running multiple experiments in the cluster, this function is not called simultaneously anymore
+												# See https://docs.python.org/3/library/os.html
 	return path2folder
 
 def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,create_new_folder=True):
