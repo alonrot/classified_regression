@@ -1,5 +1,5 @@
 executable = /bin/bash
-arguments = config/cluster/trial.sh $(date "+%Y%m%d_%H%M%S")
+arguments = config/cluster/trial.sh $(date +%Y%m%d_%H%M%S)
 error = trial.err
 output = trial.out
 log = trial.log
