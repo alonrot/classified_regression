@@ -106,7 +106,6 @@ def save_data(node2write: dict, which_obj: str, which_acqui: str, rep_nr: int) -
 		yaml.dump(node2write, stream_write)
 
 
-# def move_logging_data(which_obj: str, which_acqui: str, exp_nr: str, rep_nr: int) -> None:
 def move_logging_data(path2data: str, which_acqui: str, rep_nr: int) -> None:
 
 	# Create folders:

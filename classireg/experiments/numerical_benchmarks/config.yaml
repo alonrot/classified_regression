@@ -3,7 +3,7 @@ hydra:
     disable_existing_loggers: False
   run:
     dir: ./ # outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
-  output_subdir: "${which_objective}/EIC_results/cluster_data/.hydra"
+  output_subdir: "${which_objective}/${acqui}_results/.hydra"
 
 defaults:
   - hydra/job_logging : disabled # Completely deactivate the hydra logging. NOTE: This solution should be documented, but it's not. See https://hydra.cc/docs/configure_hydra/logging
