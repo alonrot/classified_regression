@@ -143,7 +143,7 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 			fid.write("# {0:s}\n".format("="*len(banner_str)))
 
 	# Add a line to the file:
-	str_exp_nr = path2save[-15::]
+	str_exp_nr = path2save[-14::]
 	msg_user = input("Enter a brief description of this experiment ./{0:s}/{1:s}: ".format(which_obj,str_exp_nr))
 	line2write = "# {0:s}_experiment: {1:s}   # User brief description: {2:s}".format(which_acqui,str_exp_nr,msg_user)
 	with open(path2selector, "a") as fid: # "a" to append; "w" to write (overwrites any existing content)
