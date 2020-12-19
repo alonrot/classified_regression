@@ -5,9 +5,9 @@ Nqueue = $(Nend) - $(Ninit)
 
 executable = /bin/bash
 arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EIC_standard
-error = out_cluster/condor_EIC_STA_$INT(n_rep).err
-output = out_cluster/condor_EIC_STA_$INT(n_rep).out
-log = out_cluster/condor_EIC_STA_$INT(n_rep).log
+error = condor_EIC_standard_$INT(n_rep).err
+output = condor_EIC_standard_$INT(n_rep).out
+log = condor_EIC_standard_$INT(n_rep).log
 getenv = true
 request_memory = 8000
 request_cpus = 1

@@ -15,7 +15,6 @@ from classireg.models.gpcr_model import GPCRmodel
 from classireg.models.gpclassi_model import GPClassifier
 import yaml
 import traceback
-import time
 logger = get_logger(__name__)
 np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,9 +25,6 @@ def run(cfg: DictConfig, rep_nr: int, path2data=None) -> None:
     # Random seed for numpy and torch:
     np.random.seed(rep_nr)
     torch.manual_seed(rep_nr)
-
-    # Delay the execution by a tiny amount of time to avoid collisions:
-    time.sleep(rep_nr/50.)
 
     # Load true function and initial evaluations:
     function_obj, function_cons, dim, x_min, f_min = get_objective_functions(which_objective=cfg.which_objective)

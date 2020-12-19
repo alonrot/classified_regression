@@ -19,16 +19,16 @@ def generate_folder_at_path(my_path,create_folder=True):
 		raise ValueError("my_path must be meaningful...")
 
 	today = datetime.now()
-	path2folder = my_path + today.strftime('/%Y%m%d%H%M%S')
+	path2folder = my_path + today.strftime('/%Y%m%d_%H%M%S')
 
 	if create_folder == True:
 		# os.mkdir(path2folder)
-		os.makedirs(path2folder,exist_ok=False) # When exist_ok=False (default), an exception is raised if the directory already exists
-												# When running multiple experiments in the cluster, this function is not called simultaneously anymore
+		os.makedirs(path2folder,exist_ok=True)  # When exist_ok=False (default), an exception is raised if the directory already exists
+												# When running multiple experiments in the cluster, this function is called almost simultaneously
 												# See https://docs.python.org/3/library/os.html
 	return path2folder
 
-def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,create_new_folder=True):
+def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,path2data=None):
 
 	print("")
 	logger.info("Parsing collected data into a single file ...")
@@ -55,16 +55,21 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 
 	except_vec = np.array([])
 
+	create_new_folder = False
+	if path2data is None: # This is basically when have copied the data from the cluster
+		path2data = "./"+which_obj+"/"+which_acqui+"_results/cluster_data"
+		create_new_folder = True
+
 	k = -1
 	data_corrupted = False
 	for i in range(Nrepetitions):
 
 		data_corrupted = False
 		# Open corresponding file to the wanted results:
-		path2data = "./"+which_obj+"/"+which_acqui+"_results/cluster_data/data_"+str(i)+".yaml"
-		logger.info("Loading {0:s} ...".format(path2data))
+		path2data_and_file = path2data + "/data_"+str(i)+".yaml"
+		logger.info("Loading {0:s} ...".format(path2data_and_file))
 		try:
-			with open(path2data, "r") as stream:
+			with open(path2data_and_file, "r") as stream:
 				my_node = yaml.load(stream,Loader=yaml.UnsafeLoader)
 		except Exception as inst:
 			logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
@@ -95,14 +100,14 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 		else:
 			k = k + 1
 
-	path4newfolder = "./"+which_obj+"/"+which_acqui+"_results"
 	if create_new_folder == True:
-		path2save = generate_folder_at_path(path4newfolder)
+		path2results_folder = "./"+which_obj+"/"+which_acqui+"_results"
+		path2save = generate_folder_at_path(path2results_folder)
 	else:
-		path2save = path4newfolder
+		path2save = path2data
 	del my_node
 
-	file2save = path2save + "/data.yaml"
+	file2save = path2save + "/data_all_exp.yaml"
 
 	node2write = dict()
 	node2write['regret_simple_array_list'] = regret_simple_array_list
@@ -120,8 +125,9 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 	stream_write.close()
 
 	# Copy all the cluster data to a folder, as it will be overwritten with subsequent experiments:
-	path2cluster = "./"+which_obj+"/"+which_acqui+"_results/cluster_data"
-	shutil.copytree(src=path2cluster, dst="{0:s}/cluster_data".format(path2save))
+	if create_new_folder == True:
+		path2cluster = "./"+which_obj+"/"+which_acqui+"_results/cluster_data"
+		shutil.copytree(src=path2cluster, dst="{0:s}/cluster_data".format(path2save))
 
 	# Create a yaml file that registers all experiments done on this ObjFun:
 	path2selector = "./{0:s}/selector.yaml".format(which_obj)
@@ -133,7 +139,7 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 			fid.write("# {0:s}\n".format("="*len(banner_str)))
 
 	# Add a line to the file:
-	str_exp_nr = path2save[-14::]
+	str_exp_nr = path2save[-15::]
 	msg_user = input("Enter a brief description of this experiment ./{0:s}/{1:s}: ".format(which_obj,str_exp_nr))
 	line2write = "# {0:s}_experiment: {1:s}   # User brief description: {2:s}".format(which_acqui,str_exp_nr,msg_user)
 	with open(path2selector, "a") as fid: # "a" to append; "w" to write (overwrites any existing content)

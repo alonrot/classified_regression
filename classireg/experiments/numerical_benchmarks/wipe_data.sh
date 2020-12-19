@@ -4,7 +4,7 @@ data_folder="./$1/$2_results/cluster_data"
 condor_folder="./$1/$2_results/cluster_data/condor_logging"
 
 if [[ $# -ne 2 ]] ; then
-    echo "Error: Must supply <objective {walker,branin2D,hart6D}> <acquisition {EI,EIC}>"
+    echo "Error: Must supply <objective {walker,branin2D,hart6D,micha10D}> <acquisition {EI,EIC,EIC_standard}>"
 else
 
 	echo "Total Arguments: " $#

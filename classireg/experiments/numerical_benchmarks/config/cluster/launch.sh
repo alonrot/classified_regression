@@ -5,6 +5,7 @@ echo "Total Arguments:             " $#
 echo "(1) repetition number:       " $1
 echo "(2) max. number repetitions: " $2
 echo "(3) algorithm:               " $3
+# echo "(4) folder name:             " $4
 
 export LD_LIBRARY_PATH=/lustre/home/amarcovalle/.mujoco/mujoco200/bin:/home/amarcovalle/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH
 

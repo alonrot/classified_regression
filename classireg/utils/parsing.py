@@ -106,22 +106,23 @@ def save_data(node2write: dict, which_obj: str, which_acqui: str, rep_nr: int) -
 		yaml.dump(node2write, stream_write)
 
 
-def move_logging_data(which_obj: str, which_acqui: str, rep_nr: int) -> None:
+# def move_logging_data(which_obj: str, which_acqui: str, exp_nr: str, rep_nr: int) -> None:
+def move_logging_data(path2data: str, which_acqui: str, rep_nr: int) -> None:
 
 	# Create folders:
-	path2obj = "./{0:s}".format(which_obj)
-	path2results = path2obj + "/" + which_acqui + "_results"
-	path2save = path2results + "/cluster_data"
-	path2condor_logging = path2save + "/condor_logging"
+	# path2obj = "./{0:s}".format(which_obj)
+	# path2results = path2obj + "/" + which_acqui + "_results"
+	# path2save = path2results + "/" + exp_nr
+	path2condor_logging = path2data + "/condor_logging"
 	if not os.path.exists(path2condor_logging):
 		print("Creating " + path2condor_logging + " ...")
-		os.makedirs(path2condor_logging)
+		os.makedirs(path2condor_logging,exist_ok=False)
 
 	# Move logging files:
 	ext_list = ["err","out","log"]
 	for extension in ext_list:
-		file_name = "condor_{0:s}_{1:d}.{2:s}".format(which_acqui,rep_nr,extension)
-		assert os.path.exists(file_name), "The file {0:s} does not exist".format(file_name) # make sure the files exist
+		file_name = "condor_{0:s}_{1:d}.{2:s}".format(which_acqui,rep_nr,extension) # This name must coincide with the structure of the {.err,.out,.log} files in ./config/cluster/launch_XX.sub files
+		assert os.path.exists(file_name), "The file {0:s} does not exist".format(file_name) # make sure the files exist (they are automatically generated when running the jobs on cluster)
 		try:
 			new_location = shutil.move(src="./{0:s}".format(file_name),dst="{0:s}/{1:s}".format(path2condor_logging,file_name))
 		except:

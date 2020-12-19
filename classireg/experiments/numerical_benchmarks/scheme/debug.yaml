@@ -1,33 +1,24 @@
+# # Configuration file for benchmark experiments
+# # ============================================
 
+## Standard GP parameters (objective)
 gpmodel:
   hyperpars:
-    noise_std: 
-      value: 0.01 # Homoscedastic noise, standard deviation
     optimization:
-      Nrestarts: 1
-      # algo_name: 'LN_BOBYQA'
+      Nrestarts: 2
       Nmax_evals: 200 # Max number of function evaluations
 
 ## Standard GP parameters
 gpclassimodel:
   hyperpars:
-    noise_std: 
-      value: 0.01 # Homoscedastic noise, standard deviation
     optimization:
       Nrestarts: 1
-      # algo_name: 'LN_BOBYQA'
-      Nmax_evals: 200 # Max number of function evaluations
 
-## GPCR parameters
+## GPCR parameters (constraint)
 gpcr_model:
   hyperpars:
-    noise_std: 
-      value: 0.01 # Homoscedastic noise, standard deviation
     optimization:
-      Nrestarts: 1
-      # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
-      Nmax_evals: 200 # Max number of function evaluations
-  discard_too_close_points: False
+      Nrestarts: 2
 
   ## Expectation propagation
   ep:
@@ -35,25 +26,21 @@ gpcr_model:
     prec: 1e-8 # Stopping criterion: relative precission in the logZ
     verbo: False
 
+gpmodel_cons:
+  hyperpars:
+    optimization:
+      Nrestarts: 2
+
+
 ## Optimize acquisition function
 acquisition_function:
   optimization:
-    Nrestarts: 3
-    # algo_name: 'LN_COBYLA' # Internally, the name is appended to 'nlopt.', e.g., 'nlopt.LN_COBYLA'. See https://nlopt.readthedocs.io/en/latest/NLopt_Python_Reference/
-    disp_info_scipy_opti: False # Display info about the progress of the scipy optimizer
-  prob_satisfaction: 0.90 # User-defined probability threshold (TODO: Is this really needed?)
+    Nrestarts: 2
 
 plot:
-  plotting: True
+  plotting: False
   saving: False
-  path: "./plots/toy_example" # This will automatically be appended to ${hydra.run.dir} by hydra
-  block: False
 
 NBOiters: 2
-Nrep: 1
-with_noise: False
-Ninit_points:
-  total: 
-  safe: 1
-  unsafe: 1
+
 
