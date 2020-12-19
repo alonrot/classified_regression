@@ -9,6 +9,7 @@ from classireg.utils.parsing import display_banner, get_logger, move_logging_dat
 from classireg.utils.parse_data_collection import convert_from_cluster_data_to_single_file, obj_fun_list
 import hydra
 from omegaconf import DictConfig
+import traceback
 logger = get_logger(__name__)
 np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -48,6 +49,7 @@ def main(cfg: DictConfig) -> None:
             run(cfg, cfg.rep_nr)
         except Exception as inst:
             logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
+            traceback.print_exc()
             logger.info("{0:s} failed (!!) Moving logging data anyways ...".format(cfg.acqui))
 
         move_logging_data(which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=cfg.rep_nr)
