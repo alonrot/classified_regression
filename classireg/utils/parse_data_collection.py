@@ -26,6 +26,7 @@ def generate_folder_at_path(my_path,create_folder=True,use_date=""):
 
 	if create_folder == True:
 		# os.mkdir(path2folder)
+		print("path2folder:",path2folder)
 		os.makedirs(path2folder,exist_ok=True)  # When exist_ok=False (default), an exception is raised if the directory already exists
 												# When running multiple experiments in the cluster, this function is called almost simultaneously
 												# See https://docs.python.org/3/library/os.html
