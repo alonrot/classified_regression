@@ -20,7 +20,7 @@ def generate_folder_at_path(my_path,create_folder=True,use_date=""):
 
 	if use_date == "":
 		today = datetime.now()
-		use_date = today.strftime('%Y%m%d_%H%M%S')
+		use_date = today.strftime('%Y%m%d%H%M%S')
 	
 	path2folder = my_path + "/" + str(use_date)
 
