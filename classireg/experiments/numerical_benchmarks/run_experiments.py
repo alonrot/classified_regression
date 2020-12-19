@@ -66,7 +66,7 @@ def main(cfg: DictConfig) -> None:
             traceback.print_exc()
             logger.info("{0:s} failed (!!) Moving logging data anyways ...".format(cfg.acqui))
 
-        move_logging_data(path2data=path2data,which_acqui=cfg.acqui,rep_nr=cfg.rep_nr)
+        move_logging_data(path2data=path2data,which_acqui=cfg.acqui,which_obj=cfg.which_objective,rep_nr=cfg.rep_nr)
 
     else:
         raise ValueError("cfg.run_type = {sequential,individual}")
