@@ -20,6 +20,7 @@ np.set_printoptions(linewidth=10000)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 dtype = torch.float32
 
+
 def run(cfg: DictConfig, rep_nr: int) -> None:
 
     # Random seed for numpy and torch:
