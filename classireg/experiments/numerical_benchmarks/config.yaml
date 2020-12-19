@@ -41,3 +41,5 @@ safety_mechanisms:
     use: False
     modify: False
     nr_exp: "20201219033022"
+
+date_folder_name: "" # This is the folder name

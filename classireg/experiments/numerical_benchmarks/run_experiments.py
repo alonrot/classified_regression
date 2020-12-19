@@ -57,7 +57,7 @@ def main(cfg: DictConfig) -> None:
 
             # Create the folder only once and here:
             my_path = "./{0:s}/{1:s}_results".format(cfg.which_objective,cfg.acqui)
-            path2data = generate_folder_at_path(my_path,create_folder=True) 
+            path2data = generate_folder_at_path(my_path,create_folder=True,use_date=cfg.date_folder_name)
 
             run(cfg, cfg.rep_nr, path2data)
 

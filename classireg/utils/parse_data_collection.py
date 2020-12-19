@@ -13,13 +13,16 @@ logger = get_logger(__name__)
 obj_fun_list = ["hart6D","micha10D","simple1D","branin2D","camel2D","eggs2D","walker","shubert4D","debug6D","quadruped8D"]
 algo_list_cons = ["EIC","EI","EI_heur_high","EI_heur_low","EIClassi","EIC_standard"]
 
-def generate_folder_at_path(my_path,create_folder=True):
+def generate_folder_at_path(my_path,create_folder=True,use_date=""):
 
 	if my_path is None or my_path == "":
 		raise ValueError("my_path must be meaningful...")
 
-	today = datetime.now()
-	path2folder = my_path + today.strftime('/%Y%m%d_%H%M%S')
+	if use_date == "":
+		today = datetime.now()
+		path2folder = my_path + today.strftime('/%Y%m%d_%H%M%S')
+	else:
+		path2folder = use_date
 
 	if create_folder == True:
 		# os.mkdir(path2folder)
