@@ -12,6 +12,7 @@ import os
 
 # List of algorithms:
 # list_algo = ["EIC"]
+# list_algo = ["EIC_standard"]
 # list_algo = ["EI","EIC"]
 list_algo = ["EI_heur_low","EI_heur_high","EI","EIC"]
 # list_algo = ["EI_heur_high","EIC"]
@@ -213,7 +214,7 @@ def get_plotting_data(which_obj,which_acqui,nr_exp,save_plot,block=True,pop_unwa
 		raise ValueError("which_acqui must be in " + str(list_algo) + ", but which_acqui: {0:s}".format(which_acqui))
 
 	# Open corresponding file to the wanted results:
-	path2data = "./{0:s}/{1:s}_results/{2:s}/data.yaml".format(which_obj,which_acqui,nr_exp)
+	path2data = "./{0:s}/{1:s}_results/{2:s}/data_all_exp.yaml".format(which_obj,which_acqui,nr_exp)
 	print("Loading {0:s} ...".format(path2data))
 	stream 	= open(path2data, "r")
 	my_node = yaml.load(stream,Loader=yaml.Loader)
@@ -859,7 +860,7 @@ if __name__ == "__main__":
 		plot_walker(load_from_file_selector=load_from_file_selector,save_plot=False)
 	else:
 		# plot(which_obj=ObjFun,load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=False)
-		plot_bars(load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=True)
+		plot_bars(load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=False)
 
 
 
