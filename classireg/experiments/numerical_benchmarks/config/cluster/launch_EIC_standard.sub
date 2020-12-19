@@ -4,10 +4,10 @@ n_rep = $(Process) + $INT(Ninit)
 Nqueue = $(Nend) - $(Ninit)
 
 executable = /bin/bash
-arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EIC_standard 20201219194304
-error = hart6D/condor_EIC_standard_$INT(n_rep).err
-output = hart6D/condor_EIC_standard_$INT(n_rep).out
-log = hart6D/condor_EIC_standard_$INT(n_rep).log
+arguments = config/cluster/launch.sh $INT(n_rep) $INT(Nend) EIC_standard 20201219194502
+error = eggs2D/condor_EIC_standard_$INT(n_rep).err
+output = eggs2D/condor_EIC_standard_$INT(n_rep).out
+log = eggs2D/condor_EIC_standard_$INT(n_rep).log
 getenv = true
 request_memory = 8000
 request_cpus = 1
