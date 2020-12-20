@@ -6,9 +6,9 @@ gpmodel:
   hyperpars:
     lenthscales: # The same hyperprior is assume for all lengthscales
       # prior: 'beta(a=2.0, b=6.0)' # **Works**
-      prior: 'beta(a=1.5, b=15.0)' # Debug (shorter range for ls)
-    outputscale: 
-      prior: 'gamma(a=2.0, scale=1.0)'
+      prior: 'beta(a=1.5, b=15.0)' # Debug (shorter range for ls) -> mean = a / (a+b)
+    outputscale: # Distribution over the variance
+      prior: 'gamma(a=2.0, scale=1.0)' # -> mean = a * scale
     noise_std: 
       value: 0.01 # Homoscedastic noise, standard deviation
     optimization:

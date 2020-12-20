@@ -40,7 +40,7 @@ class Eggs2D(ObjectiveFunction):
 
 	@staticmethod
 	def true_minimum():
-		x_gm = torch.tensor([[ 1./3 , 1./3 ]])
+		x_gm = torch.tensor([[ 2./3 , 1./3 ]])
 		f_gm = -98. # After scaling
 		return x_gm, f_gm
 
@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
 	fun = Eggs2D()
 
-	# train_x = torch.Tensor([[0.3333, 0.33333]])
-	train_x = torch.Tensor([[0.5578, 0.0558]])
+	train_x = torch.Tensor([[2./3, 1./3]])
+	# train_x = torch.Tensor([[0.5578, 0.0558]])
 
 	# train_x = torch.Tensor([[0.0, 1.0]])
 

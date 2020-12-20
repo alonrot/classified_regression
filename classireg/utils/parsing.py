@@ -121,9 +121,10 @@ def move_logging_data(path2data: str, which_acqui: str, which_obj: str, rep_nr: 
 	ext_list = ["err","out","log"]
 	for extension in ext_list:
 		file_name = "condor_{0:s}_{1:d}.{2:s}".format(which_acqui,rep_nr,extension) # This name must coincide with the structure of the {.err,.out,.log} files in ./config/cluster/launch_XX.sub files
-		assert os.path.exists(file_name), "The file {0:s} does not exist".format(file_name) # make sure the files exist (they are automatically generated when running the jobs on cluster)
+		file_and_path = "./{0:s}/{1:s}".format(which_obj,file_name)
+		assert os.path.exists(file_and_path), "The path {0:s} does not exist".format(file_and_path) # make sure the files exist (they are automatically generated when running the jobs on cluster)
 		try:
-			new_location = shutil.move(src="./{0:s}/{1:s}".format(which_obj,file_name),dst="{0:s}/{1:s}".format(path2condor_logging,file_name))
+			new_location = shutil.move(src=file_and_path,dst="{0:s}/{1:s}".format(path2condor_logging,file_name))
 		except:
 			print("File {0:s} could not be moved to {1:s}/{2:s} ...".format(file_name,path2condor_logging,file_name))
 		else:

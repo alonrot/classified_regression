@@ -12,9 +12,9 @@ defaults:
   # - config: branin2D
   # - config: hart6D
   # - config: debug6D
-  # - config: micha10D
+  - config: micha10D
   # - config: camel2D
-  - config: eggs2D
+  # - config: eggs2D
   # - config: quadruped8D
   # - config: walker
   # - config: shubert4D

@@ -9,12 +9,13 @@ import pdb
 import sys
 import yaml
 import os
+import pickle
 
 # List of algorithms:
 # list_algo = ["EIC"]
 # list_algo = ["EIC_standard"]
 # list_algo = ["EI","EIC"]
-list_algo = ["EI_heur_low","EI_heur_high","EI","EIC"]
+list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU"]
 # list_algo = ["EI_heur_high","EIC"]
 # list_algo = ["EI_heur_high","EIClassi","EIC"]
 
@@ -215,6 +216,10 @@ def get_plotting_data(which_obj,which_acqui,nr_exp,save_plot,block=True,pop_unwa
 
 	# Open corresponding file to the wanted results:
 	path2data = "./{0:s}/{1:s}_results/{2:s}/data_all_exp.yaml".format(which_obj,which_acqui,nr_exp)
+	if not os.path.exists(path2data):
+		path2data = "./{0:s}/{1:s}_results/{2:s}/data.yaml".format(which_obj,which_acqui,nr_exp) # Backwards compatibility
+	if not os.path.exists(path2data):
+		pdb.set_trace()
 	print("Loading {0:s} ...".format(path2data))
 	stream 	= open(path2data, "r")
 	my_node = yaml.load(stream,Loader=yaml.Loader)
@@ -483,9 +488,10 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	str_table_list = [None]*len(list_algo)
 	rescale = False
 	obj_fun_list = ["micha10D","hart6D","eggs2D"]
+	# obj_fun_list = ["micha10D"]
 	obj_fun_list_names = ["Michalewicz 10D","Hartman 6D","Egg crate 2D"]
-	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$"]
-	# list_algo = ["EI_heur_low","EI_heur_high","EI","EIC"]
+	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$","PIBU"]
+	# list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU"]
 	Nobj_funs = len(obj_fun_list)
 	Nalgos = len(list_algo)
 	regret_mean_list_algo = np.zeros((Nobj_funs,Nalgos))
@@ -493,25 +499,44 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	thres_mean_list_objs = np.zeros(Nobj_funs)
 	thres_std_list_objs = np.zeros(Nobj_funs)
 	thres_mean_EIC_obj = thres_std_EIC_obj = 0.0
-	Ncut = 60
+	# Ncut = 60
+	Ncut = 100
 	for j in range(Nobj_funs):
 
 		for i in range(Nalgos):
 
-			if load_from_file_selector:
-				nr_exp = get_exp_nr_from_file(obj_fun_list[j],list_algo[i])
+
+			if list_algo[i] == "PIBU":
+
+				path2mat_data = "/Users/alonrot/MPI/WIP_projects/pibu/results/{0:s}/regret_data.pkl".format(obj_fun_list[j])
+				with open(path2mat_data, 'rb') as fin :
+					regret_data = pickle.load(fin)
+					regret_data = regret_data.squeeze()
+
+					# pdb.set_trace()
+					regret_simple_mean = regret_data[0]
+					regret_simple_std = regret_data[1]
+
+				regret_mean_list_algo[j,i] = regret_simple_mean
+				regret_std_list_algo[j,i] = regret_simple_std
+
 			else:
-				nr_exp = get_exp_nr_most_recent(obj_fun_list[j],list_algo[i])
 
-			regret_simple_mean,\
-			regret_simple_std,\
-			threshold_mean,\
-			threshold_std,\
-			rho_t_mean,\
-			rho_t_std = get_plotting_data(obj_fun_list[j],list_algo[i],nr_exp,save_plot=False,block=False,get_log_data=get_log_data)
+				if load_from_file_selector:
+					nr_exp = get_exp_nr_from_file(obj_fun_list[j],list_algo[i])
+				else:
+					nr_exp = get_exp_nr_most_recent(obj_fun_list[j],list_algo[i])
 
-			regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
-			regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
+				regret_simple_mean,\
+				regret_simple_std,\
+				threshold_mean,\
+				threshold_std,\
+				rho_t_mean,\
+				rho_t_std = get_plotting_data(obj_fun_list[j],list_algo[i],nr_exp,save_plot=False,block=False,get_log_data=get_log_data)
+
+
+				regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
+				regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
 
 			if list_algo[i] == "EIC":
 				thres_mean_EIC_obj = threshold_mean[Ncut-1]
@@ -525,7 +550,9 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 
 
 	# We need to normalize the regret across objectives !!!!
-	# hdl_splot_regret.plot()	
+	# hdl_splot_regret.plot()
+
+	# pdb.set_trace()
 
 	# Normalize:
 	norm_const_vec = 1.1*np.amax(regret_mean_list_algo,axis=1)
@@ -541,11 +568,14 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	# Colors:
 	color_list = plt.cm.Set2(np.arange(Nalgos-1,-1,-1))
 
+	bar_pos = lambda xx, width, iter_nr: xx + (- 3./2 + iter_nr)*width
+
 	# Plot regret:
-	hdl_splot_regret.bar(xx - width/2*3, regret_mean_list_algo[:,0], width, label=list_algo_names[0], yerr=regret_std_list_algo[:,0], capsize=5.0,color=color_list[0,:])
-	hdl_splot_regret.bar(xx - width/2, regret_mean_list_algo[:,1], width, label=list_algo_names[1], yerr=regret_std_list_algo[:,1], capsize=5.0,color=color_list[1,:])
-	hdl_splot_regret.bar(xx + width/2, regret_mean_list_algo[:,2], width, label=list_algo_names[2], yerr=regret_std_list_algo[:,2], capsize=5.0,color=color_list[2,:])
-	hdl_splot_regret.bar(xx + width/2*3, regret_mean_list_algo[:,3], width, label=list_algo_names[3], yerr=regret_std_list_algo[:,3], capsize=5.0,color=color_list[3,:])
+	for ii in range(Nalgos):
+		hdl_splot_regret.bar(bar_pos(xx,width,ii), regret_mean_list_algo[:,ii], width, label=list_algo_names[ii], yerr=regret_std_list_algo[:,ii], capsize=5.0,color=color_list[ii,:])
+	# hdl_splot_regret.bar(xx - width/2, regret_mean_list_algo[:,1], width, label=list_algo_names[1], yerr=regret_std_list_algo[:,1], capsize=5.0,color=color_list[1,:])
+	# hdl_splot_regret.bar(xx + width/2, regret_mean_list_algo[:,2], width, label=list_algo_names[2], yerr=regret_std_list_algo[:,2], capsize=5.0,color=color_list[2,:])
+	# hdl_splot_regret.bar(xx + width/2*3, regret_mean_list_algo[:,3], width, label=list_algo_names[3], yerr=regret_std_list_algo[:,3], capsize=5.0,color=color_list[3,:])
 
 	# Add tick labels:
 	hdl_splot_regret.set_xticks(xx)
@@ -560,7 +590,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	hdl_splot_regret.set_axisbelow(True)
 
 	# Plot threshold:
-	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[3,:])
+	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[Nalgos-1,:])
 	# hdl_splot_thres.axhline(y=0.0, color="black", linewidth=1)
 	hdl_splot_thres.set_ylabel(r"Threshold $\hat{c}$", fontsize=fontsize_labels)
 	hdl_splot_thres.set_xticks(xx)
