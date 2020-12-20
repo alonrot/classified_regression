@@ -15,7 +15,7 @@ import pickle
 # list_algo = ["EIC"]
 # list_algo = ["EIC_standard"]
 # list_algo = ["EI","EIC"]
-list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU"]
+list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU","EIC_standard"]
 # list_algo = ["EI_heur_high","EIC"]
 # list_algo = ["EI_heur_high","EIClassi","EIC"]
 
@@ -490,7 +490,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	obj_fun_list = ["micha10D","hart6D","eggs2D"]
 	# obj_fun_list = ["micha10D"]
 	obj_fun_list_names = ["Michalewicz 10D","Hartman 6D","Egg crate 2D"]
-	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$","PIBU"]
+	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$","PIBU","EIC(sta)"]
 	# list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU"]
 	Nobj_funs = len(obj_fun_list)
 	Nalgos = len(list_algo)
@@ -538,7 +538,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
 				regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
 
-			if list_algo[i] == "EIC":
+			if list_algo[i] == "EIC": # EIC is actually EIC2
 				thres_mean_EIC_obj = threshold_mean[Ncut-1]
 				thres_std_EIC_obj = threshold_std[Ncut-1]
 
@@ -552,7 +552,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	# We need to normalize the regret across objectives !!!!
 	# hdl_splot_regret.plot()
 
-	# pdb.set_trace()
+	pdb.set_trace()
 
 	# Normalize:
 	norm_const_vec = 1.1*np.amax(regret_mean_list_algo,axis=1)
@@ -568,11 +568,16 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	# Colors:
 	color_list = plt.cm.Set2(np.arange(Nalgos-1,-1,-1))
 
-	bar_pos = lambda xx, width, iter_nr: xx + (- 3./2 + iter_nr)*width
+	if Nalgos > 1:
+		bar_center_points = np.linspace(-(Nalgos-1)*width/2,+(Nalgos-1)*width/2,Nalgos)
+	else:
+		bar_center_points = [0]
+
+
 
 	# Plot regret:
 	for ii in range(Nalgos):
-		hdl_splot_regret.bar(bar_pos(xx,width,ii), regret_mean_list_algo[:,ii], width, label=list_algo_names[ii], yerr=regret_std_list_algo[:,ii], capsize=5.0,color=color_list[ii,:])
+		hdl_splot_regret.bar(xx + bar_center_points[ii], regret_mean_list_algo[:,ii], width, label=list_algo_names[ii], yerr=regret_std_list_algo[:,ii], capsize=5.0,color=color_list[ii,:])
 	# hdl_splot_regret.bar(xx - width/2, regret_mean_list_algo[:,1], width, label=list_algo_names[1], yerr=regret_std_list_algo[:,1], capsize=5.0,color=color_list[1,:])
 	# hdl_splot_regret.bar(xx + width/2, regret_mean_list_algo[:,2], width, label=list_algo_names[2], yerr=regret_std_list_algo[:,2], capsize=5.0,color=color_list[2,:])
 	# hdl_splot_regret.bar(xx + width/2*3, regret_mean_list_algo[:,3], width, label=list_algo_names[3], yerr=regret_std_list_algo[:,3], capsize=5.0,color=color_list[3,:])
