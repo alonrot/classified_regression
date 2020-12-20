@@ -499,8 +499,8 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	thres_mean_list_objs = np.zeros(Nobj_funs)
 	thres_std_list_objs = np.zeros(Nobj_funs)
 	thres_mean_EIC_obj = thres_std_EIC_obj = 0.0
-	# Ncut = 60
-	Ncut = 100
+	Ncut = 60
+	# Ncut = 100
 	for j in range(Nobj_funs):
 
 		for i in range(Nalgos):
@@ -519,6 +519,11 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 
 				regret_mean_list_algo[j,i] = regret_simple_mean
 				regret_std_list_algo[j,i] = regret_simple_std
+
+				print("regret_mean_list_algo[j,i]:",regret_mean_list_algo[j,i])
+				print("regret_std_list_algo[j,i]:",regret_std_list_algo[j,i])
+
+
 
 			else:
 
@@ -552,10 +557,10 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	# We need to normalize the regret across objectives !!!!
 	# hdl_splot_regret.plot()
 
-	pdb.set_trace()
+	# pdb.set_trace()
 
 	# Normalize:
-	norm_const_vec = 1.1*np.amax(regret_mean_list_algo,axis=1)
+	norm_const_vec = 1.1*np.amax(regret_mean_list_algo[:,0:4],axis=1) # In the first submission, we only had 4 algorithms, so we take the max w.r.t to those
 	regret_mean_list_algo = regret_mean_list_algo / norm_const_vec.reshape(-1,1)
 	regret_std_list_algo = regret_std_list_algo / norm_const_vec.reshape(-1,1)
 	regret_std_list_algo = regret_std_list_algo / 4.0
@@ -573,26 +578,28 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	else:
 		bar_center_points = [0]
 
-
-
 	# Plot regret:
 	for ii in range(Nalgos):
 		hdl_splot_regret.bar(xx + bar_center_points[ii], regret_mean_list_algo[:,ii], width, label=list_algo_names[ii], yerr=regret_std_list_algo[:,ii], capsize=5.0,color=color_list[ii,:])
-	# hdl_splot_regret.bar(xx - width/2, regret_mean_list_algo[:,1], width, label=list_algo_names[1], yerr=regret_std_list_algo[:,1], capsize=5.0,color=color_list[1,:])
-	# hdl_splot_regret.bar(xx + width/2, regret_mean_list_algo[:,2], width, label=list_algo_names[2], yerr=regret_std_list_algo[:,2], capsize=5.0,color=color_list[2,:])
-	# hdl_splot_regret.bar(xx + width/2*3, regret_mean_list_algo[:,3], width, label=list_algo_names[3], yerr=regret_std_list_algo[:,3], capsize=5.0,color=color_list[3,:])
 
 	# Add tick labels:
 	hdl_splot_regret.set_xticks(xx)
 	hdl_splot_regret.set_xticklabels(obj_fun_list_names, fontsize=fontsize_labels)
+	hdl_splot_regret.set_yticks(np.linspace(0,1.6,9))
 	hdl_splot_regret.tick_params(axis='y', labelsize=fontsize_labels)
 
-	hdl_splot_regret.set_ylim([0.0,1.50])
+	hdl_splot_regret.set_ylim([0.0,1.70])
 	hdl_splot_regret.set_ylabel(r"Simple regret $r_T$", fontsize=fontsize_labels)
 	
-	hdl_splot_regret.legend(loc="upper center",ncol=Nalgos)
+	ncol_legend = 2
+	# ncol_legend = Nalgos
+	hdl_splot_regret.legend(loc="upper left",ncol=ncol_legend)
 	hdl_splot_regret.grid(True,which="major",axis="y",linestyle="--")
 	hdl_splot_regret.set_axisbelow(True)
+
+
+	# Add text:
+	hdl_splot_regret.text(x=xx[-1]+bar_center_points[4],y=1.5,s="4.87",ha="center")
 
 	# Plot threshold:
 	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[Nalgos-1,:])
