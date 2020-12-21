@@ -35,7 +35,6 @@ def one_experiment(my_seed,which_obj):
 	torch.manual_seed(my_seed)
 	np.random.seed(my_seed)
 
-	
 	if which_obj == "eggs2D":
 		fun_obj = Eggs2D(noise_std=0.01)
 		y_opt = 98.
@@ -74,11 +73,6 @@ def one_experiment(my_seed,which_obj):
 	parameter_set = linearly_spaced_combinations(bounds=bounds,num_samples=Nsamples)
 	opt = SafeOpt([gp_obj,gp_cons], parameter_set, fmin=[-float("Inf"), 0.], beta=beta_par)
 
-	# print("opt.beta:",opt.beta(opt.gp.X.shape[0]))
-
-	# pdb.set_trace()
-	# gp_obj.predict_noiseless(parameter_set)
-
 	NBOiters = 100
 	y_obj = y0_obj
 	y_cons = y0_cons
@@ -104,7 +98,6 @@ def one_experiment(my_seed,which_obj):
 	regret = y_opt - y_obj_best
 
 	return regret
-
 
 if __name__ == "__main__":
 

@@ -10,6 +10,9 @@ import sys
 import yaml
 import os
 import pickle
+from brokenaxes import brokenaxes
+from matplotlib.gridspec import GridSpec
+from prettytable import PrettyTable
 
 # List of algorithms:
 # list_algo = ["EIC"]
@@ -225,6 +228,23 @@ def get_plotting_data(which_obj,which_acqui,nr_exp,save_plot,block=True,pop_unwa
 	my_node = yaml.load(stream,Loader=yaml.Loader)
 	stream.close()
 
+	# pdb.set_trace()
+
+
+	# # Finding number of failures (debug):
+	# if which_acqui == "EIC_standard":
+	# 	print("which_acqui: Standard EIC")
+	# 	print("which_obj: ", which_obj)
+	# 	print("my_node.keys(): ", my_node.keys())
+
+
+	# # Finding number of failures (debug):
+	# if which_acqui == "EIC":
+	# 	print("which_acqui: EIC2")
+	# 	print("which_obj: ", which_obj)
+	# 	print("my_node.keys(): ", my_node.keys())
+
+
 	regret_simple_array_list = my_node['regret_simple_array_list']
 	threshold_array_list = my_node['threshold_array_list'] if which_acqui == "EIC" else None
 
@@ -283,13 +303,74 @@ def get_plotting_data(which_obj,which_acqui,nr_exp,save_plot,block=True,pop_unwa
 	add_plot(var_vec=regret_simple_mean,axis=hdl_plt_regret_simple,color="lightcoral")
 
 	# Add DeltaBt:
-	if which_acqui == "EIC":
+	if which_acqui == "EIC": # Our method (EIC2)
 		if which_obj == "eggs2D":
 			threshold_array_list = [np.abs(thres_array-10.0) for thres_array in threshold_array_list]
 		threshold_mean, threshold_std = compute_mean_and_var(threshold_array_list,hold_after_termination=True, NBOiters_max=NBOiters_max,pop_unwanted_els=False,pop_N=75)
 		add_plot(var_vec=threshold_mean,axis=hdl_plt_threshold,color="lightcoral")
 	else:
 		threshold_mean, threshold_std, rho_t_mean, rho_t_std = None, None, None, None
+
+	# if which_acqui == "EIC_standard": # Our method (EIC2)
+	# 	# pdb.set_trace()
+
+	# 	train_y_list = my_node['train_y_list']
+	# 	Nevals_safe_vec = [len(ll) for ll in train_y_list]
+
+	# 	Nevals_safe_vec = np.array(Nevals_safe_vec)
+	# 	Nevals_vec = 101
+
+	# 	perc_safe_evals_mean = np.mean(Nevals_safe_vec / Nevals_vec * 100)
+	# 	perc_safe_evals_std = np.std(Nevals_safe_vec / Nevals_vec * 100)
+
+	# 	print("\n\nEIC standard - "+which_obj)
+	# 	print("Percentage of safe evaluations: {0:2.2f} ({1:2.2f}) \n".format(perc_safe_evals_mean,perc_safe_evals_std))
+
+	# 	# 'train_y_list', 'train_ys_list'])
+
+
+	if "train_y_obj_list" in my_node.keys() and "train_y_cons_list" in my_node.keys():
+
+		if which_acqui in ["EI_heur_low","EI_heur_high","EI"]: # BO case; ese label_cons_array_list
+
+			label_cons_array_list = my_node['label_cons_array_list']
+
+			Nevals_safe_vec = [sum(label_cons == +1) if label_cons is not None else float("Inf") for label_cons in label_cons_array_list]
+			Nevals_tot_vec = [len(label_cons) if label_cons is not None else float("Inf") for label_cons in label_cons_array_list]
+
+		else:
+			
+			train_y_obj_list = my_node['train_y_obj_list']
+			train_y_cons_list = my_node['train_y_cons_list']
+
+			Nevals_safe_vec = [len(ll) if ll is not None else float("Inf") for ll in train_y_obj_list]
+			Nevals_tot_vec = [ll.shape[0] if ll is not None else float("Inf") for ll in train_y_cons_list]
+
+		Nevals_safe_vec = np.array(Nevals_safe_vec)
+		Nevals_tot_vec = np.array(Nevals_tot_vec)
+
+		# Remove infs:
+		Nevals_safe_vec = Nevals_safe_vec[Nevals_safe_vec != float("Inf")]
+		Nevals_tot_vec = Nevals_tot_vec[Nevals_tot_vec != float("Inf")]
+		
+		# Double-check:
+		if not len(Nevals_safe_vec) > 0 and len(Nevals_tot_vec) > 0:
+			pdb.set_trace()
+
+		if np.any(Nevals_tot_vec != Nevals_tot_vec[0]):
+			print("Some experiments lasted for less than {0:f} iters".format(max(Nevals_tot_vec)))
+			print("Specifically, they lasted: " + str(Nevals_tot_vec[max(Nevals_tot_vec) != Nevals_tot_vec]))
+
+		perc_safe_evals_mean = np.mean(Nevals_safe_vec / Nevals_tot_vec * 100)
+		perc_safe_evals_std = np.std(Nevals_safe_vec / Nevals_tot_vec * 100)
+
+		print("\n\nEIC standard - "+which_obj)
+		print("Percentage of safe evaluations: {0:2.2f} ({1:2.2f}) \n".format(perc_safe_evals_mean,perc_safe_evals_std))
+
+	else:
+
+		perc_safe_evals_mean = 0.0
+		perc_safe_evals_std = 0.0
 
 	if save_plot == True:
 		print("Saving plot...")
@@ -302,7 +383,7 @@ def get_plotting_data(which_obj,which_acqui,nr_exp,save_plot,block=True,pop_unwa
 		plt.show(block=True)
 	else:
 		plt.close(hdl_fig)
-		return regret_simple_mean, regret_simple_std, threshold_mean, threshold_std, None, None
+		return regret_simple_mean, regret_simple_std, threshold_mean, threshold_std, perc_safe_evals_mean, perc_safe_evals_std
 
 def add_plot_attributes(axes,fontsize_labels,ylabel,xlabel=None,supress_xticks=False):
 	if xlabel is not None:
@@ -477,6 +558,12 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	hdl_splot_regret = plt.subplot2grid(grid_total, grid_regret, rowspan=3,fig=hdl_fig)
 	hdl_splot_thres  = plt.subplot2grid(grid_total, grid_thres, rowspan=1,fig=hdl_fig, sharex=hdl_splot_regret)
 
+
+	# hdl_splot_thres, hdl_splot_regret = GridSpec(2,1)
+	# hdl_splot_regret_bax = brokenaxes(xlims=((.1, .3),(.7, .8)), subplot_spec=hdl_splot_regret)
+	# https://github.com/bendichter/brokenaxes
+
+
 	# hdl_splot_regret.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
 
 	# plot_every = 2
@@ -498,6 +585,8 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	regret_std_list_algo = np.zeros((Nobj_funs,Nalgos))
 	thres_mean_list_objs = np.zeros(Nobj_funs)
 	thres_std_list_objs = np.zeros(Nobj_funs)
+	perc_safe_evals_mean_all = np.zeros((Nobj_funs,Nalgos))
+	perc_safe_evals_std_all = np.zeros((Nobj_funs,Nalgos))
 	thres_mean_EIC_obj = thres_std_EIC_obj = 0.0
 	Ncut = 60
 	# Ncut = 100
@@ -523,6 +612,11 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				print("regret_mean_list_algo[j,i]:",regret_mean_list_algo[j,i])
 				print("regret_std_list_algo[j,i]:",regret_std_list_algo[j,i])
 
+				perc_safe_evals_mean_all[j,i] = 101 - regret_data[2]
+				perc_safe_evals_std_all[j,i] = regret_data[3]
+
+				# pdb.set_trace()
+
 
 			elif list_algo[i] == "SafeOpt" and obj_fun_list[j] == "eggs2D":
 
@@ -543,12 +637,19 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				regret_simple_std,\
 				threshold_mean,\
 				threshold_std,\
-				rho_t_mean,\
-				rho_t_std = get_plotting_data(obj_fun_list[j],list_algo[i],nr_exp,save_plot=False,block=False,get_log_data=get_log_data)
+				perc_safe_evals_mean,\
+				perc_safe_evals_std = get_plotting_data(obj_fun_list[j],list_algo[i],nr_exp,save_plot=False,block=False,get_log_data=get_log_data)
 
+				# pdb.set_trace()
+				perc_safe_evals_mean_all[j,i] = perc_safe_evals_mean
+				perc_safe_evals_std_all[j,i] = perc_safe_evals_std
 
-				regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
-				regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
+				if list_algo[i] != "EIC_standard":
+					regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
+					regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
+				else:
+					regret_mean_list_algo[j,i] = regret_simple_mean[-1]
+					regret_std_list_algo[j,i] = regret_simple_std[-1]					
 
 			if list_algo[i] == "EIC": # EIC is actually EIC2
 				thres_mean_EIC_obj = threshold_mean[Ncut-1]
@@ -557,14 +658,26 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				# if obj_fun_list[j] == "eggs2D": # This isn't necessary because in get_plotting_data() we have already subtracted 10.0: line 281-282 (commented out by default; uncomment for obatining the desired plot)
 				# 	thres_mean_EIC_obj -= 10.0
 
-		thres_mean_list_objs[j] = thres_mean_EIC_obj
-		thres_std_list_objs[j] = thres_std_EIC_obj
+				thres_mean_list_objs[j] = thres_mean_EIC_obj
+				thres_std_list_objs[j] = thres_std_EIC_obj
 
 
 	# We need to normalize the regret across objectives !!!!
 	# hdl_splot_regret.plot()
 
-	# pdb.set_trace()
+
+	# Percentage of safe evaluations in a table:
+	obj_fun_list_names_and_table_name = ["Perc. safe evals"] + obj_fun_list_names
+	my_tab = PrettyTable(obj_fun_list_names_and_table_name)
+	for ii in range(Nalgos):
+
+		els = [ list_algo_names[ii] ]
+		for jj in range(Nobj_funs):
+			els.append( "{0:2.2f} ({1:2.2f})".format( perc_safe_evals_mean_all[jj,ii] , perc_safe_evals_std_all[jj,ii] ) )
+
+		my_tab.add_row(els)
+	print(my_tab)
+
 
 	# Normalize:
 	norm_const_vec = 1.1*np.amax(regret_mean_list_algo[:,0:4],axis=1) # In the first submission, we only had 4 algorithms, so we take the max w.r.t to those
@@ -606,7 +719,8 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 
 
 	# Add text:
-	hdl_splot_regret.text(x=xx[-1]+bar_center_points[4],y=1.5,s="4.87",ha="center")
+	hdl_splot_regret.text(x=xx[-1]+bar_center_points[4],y=1.55,s="4.868",ha="center",fontweight="bold")
+	hdl_splot_regret.text(x=xx[-1]+bar_center_points[6],y=1.55,s="4.867",ha="center",fontweight="bold")
 
 	# Plot threshold:
 	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[Nalgos-1,:])
@@ -899,17 +1013,18 @@ def plot_walker(load_from_file_selector,save_plot,block=True):
 
 if __name__ == "__main__":
 
-	if len(sys.argv) != 4:
-		raise ValueError("Required input arguments: <ObjFun {hart6D,branin2D}> <Load from selector.yaml {0,1}> <Logarithmic scale {0,1}>")
+	if len(sys.argv) != 5:
+		raise ValueError("Required input arguments: <ObjFun {hart6D,branin2D}> <Load from selector.yaml {0,1}> <Logarithmic scale {0,1}> <save_plot {0,1}>")
 	ObjFun = sys.argv[1]
 	load_from_file_selector = sys.argv[2] == "1"
 	get_log_data = sys.argv[3] == "1"
+	save_plot = sys.argv[4] == "1"
 
 	if ObjFun == "walker":
-		plot_walker(load_from_file_selector=load_from_file_selector,save_plot=False)
+		plot_walker(load_from_file_selector=load_from_file_selector,save_plot=save_plot)
 	else:
 		# plot(which_obj=ObjFun,load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=False)
-		plot_bars(load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=False)
+		plot_bars(load_from_file_selector=load_from_file_selector,get_log_data=get_log_data,save_plot=save_plot)
 
 
 

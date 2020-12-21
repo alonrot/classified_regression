@@ -56,6 +56,11 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 	train_xs_list = [None] * Nrepetitions
 	train_x_list = [None] * Nrepetitions
 	train_y_list = [None] * Nrepetitions
+	train_y_obj_list = [None] * Nrepetitions
+	train_y_cons_list = [None] * Nrepetitions
+	train_x_obj_list = [None] * Nrepetitions
+	train_x_cons_list = [None] * Nrepetitions
+	label_cons_array_list = [None] * Nrepetitions
 
 	except_vec = np.array([])
 
@@ -89,10 +94,46 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 			threshold_array_list[k] = my_node['threshold_array']
 			train_x_list[k] = my_node["GPs"][0]["train_inputs"]
 			train_y_list[k] = my_node["GPs"][0]["train_targets"]
-			if which_acqui == "EIC":
-				if "train_ys" in my_node["GPs"][1].keys():
-					train_ys_list[k] = my_node["GPs"][1]["train_ys"]
-					train_xs_list[k] = my_node["GPs"][1]["train_xs"]
+
+			if "label_cons_array" in my_node.keys(): # Present in the BO loops
+				label_cons_array_list[k] = my_node["label_cons_array"][-1] # The last element is the one that contains all the history of all iterations
+
+			# if "train_targets" in my_node["GPs"][1].keys():
+
+			# if which_acqui == "EIC":
+				# if "train_ys" in my_node["GPs"][1].keys():
+				# 	train_ys_list[k] = my_node["GPs"][1]["train_ys"]
+				# 	train_xs_list[k] = my_node["GPs"][1]["train_xs"]
+				# elif "train_yl_cons" in my_node["GPs"][1].keys():
+				# 	l_evals = my_node["GPs"][1]["train_yl_cons"][:,1]
+				# 	train_xs_list[k] = my_node["GPs"][1]['train_inputs'][l_evals == +1,:]
+				# if "train_targets" in my_node["GPs"][1].keys():
+				# 	train_xs_list[k] = my_node["GPs"][1]['train_inputs'][l_evals == +1,:]
+
+				# 	if my_node["GPs"][1]["train_targets"].shape[0] < 101:
+				# 		pdb.set_trace()
+
+				# l_evals = my_node["GPs"][1]["train_targets"][:,1]
+				
+			train_x_obj_list[k] = my_node["GPs"][0]["train_inputs"]
+			train_y_obj_list[k] = my_node["GPs"][0]["train_targets"]
+
+			if my_node["GPs"][1] is not None:
+
+				train_x_cons_list[k] = my_node["GPs"][1]["train_inputs"]
+				train_y_cons_list[k] = my_node["GPs"][1]["train_targets"]
+			
+				# pdb.set_trace()
+
+			# In the middle of extracting the safe % evals for EIC.
+			# Make sure the length of my_node["GPs"][1].train_inputs is always 101, or just divide by its length when computing the perc/
+			# I'd say we could simply add a new list with the perc. of safe evaluations ... not sure ...
+
+
+			# elif "train_yl_cons" in my_node["GPs"][1].keys():
+			# 	l_evals = my_node["GPs"][1]["train_yl_cons"][:,1]				
+			# 	train_xs_list[k] = my_node["GPs"][1]['train_inputs'][l_evals == +1,:]
+
 		except Exception as inst:
 			logger.info("Exception (!) type: {0:s} | args: {1:s}".format(str(type(inst)),str(inst.args)))
 			logger.info("Probably some regrets are missing...")
@@ -109,6 +150,7 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 		path2save = generate_folder_at_path(path2results_folder)
 	else:
 		path2save = path2data
+
 	del my_node
 
 	file2save = path2save + "/data_all_exp.yaml"
@@ -122,6 +164,14 @@ def convert_from_cluster_data_to_single_file(which_obj,which_acqui,Nrepetitions,
 
 	node2write['train_x_list'] = train_x_list
 	node2write['train_y_list'] = train_y_list
+
+	node2write['train_x_obj_list'] = train_y_obj_list
+	node2write['train_y_obj_list'] = train_x_obj_list
+	
+	node2write['train_x_cons_list'] = train_x_cons_list
+	node2write['train_y_cons_list'] = train_y_cons_list
+
+	node2write['label_cons_array_list'] = label_cons_array_list
 
 	logger.info("Saving in {0:s}".format(file2save))
 	stream_write = open(file2save, "w")
