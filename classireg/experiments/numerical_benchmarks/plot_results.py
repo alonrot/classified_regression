@@ -15,7 +15,7 @@ import pickle
 # list_algo = ["EIC"]
 # list_algo = ["EIC_standard"]
 # list_algo = ["EI","EIC"]
-list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU","EIC_standard"]
+list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU","EIC_standard","SafeOpt"]
 # list_algo = ["EI_heur_high","EIC"]
 # list_algo = ["EI_heur_high","EIClassi","EIC"]
 
@@ -490,7 +490,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	obj_fun_list = ["micha10D","hart6D","eggs2D"]
 	# obj_fun_list = ["micha10D"]
 	obj_fun_list_names = ["Michalewicz 10D","Hartman 6D","Egg crate 2D"]
-	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$","PIBU","EIC(sta)"]
+	list_algo_names = ["MC+EI","HC+EI","AC+EI",r"EIC$^2$","PIBU","EIC(sta)","SafeOpt"]
 	# list_algo = ["EI_heur_low","EI_heur_high","EI","EIC","PIBU"]
 	Nobj_funs = len(obj_fun_list)
 	Nalgos = len(list_algo)
@@ -524,6 +524,13 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				print("regret_std_list_algo[j,i]:",regret_std_list_algo[j,i])
 
 
+			elif list_algo[i] == "SafeOpt" and obj_fun_list[j] == "eggs2D":
+
+				regret_mean_list_algo[j,i] = 18.963873918843664
+				regret_std_list_algo[j,i] = 0.007407372403685516
+
+			elif list_algo[i] == "SafeOpt":
+				pass
 
 			else:
 

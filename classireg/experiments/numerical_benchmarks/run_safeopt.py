@@ -30,18 +30,32 @@ def get_new_evals(x,fun_obj,fun_cons):
 	return y_obj, y_cons
 
 
-def one_experiment(my_seed):
+def one_experiment(my_seed,which_obj):
 
 	torch.manual_seed(my_seed)
 	np.random.seed(my_seed)
 
-	dim = 2
-	fun_obj = Eggs2D(noise_std=0.01)
+	
+	if which_obj == "eggs2D":
+		fun_obj = Eggs2D(noise_std=0.01)
+		y_opt = 98.
+		dim = 2
+		x0 = torch.tensor([[0.1578, 0.558]])
+		Nsamples = 100
+		beta_par = 2
+	elif which_obj == "hart6D":
+		fun_obj = Hartmann6D(noise_std=0.01)
+		y_opt = +3.32236801141551 * 10;
+		dim = 6
+		x0 = torch.tensor([[0.4493, 0.6189, 0.2756, 0.7961, 0.2482, 0.9121]])
+		Nsamples = 15
+		beta_par = 3
+	else:
+		raise ValueError("which_obj incorrect")
 	fun_cons = ConsBallRegions(dim=dim,noise_std=0.01)
 
 	# Initial evaluations:
-	# x0 = np.array([[0.1578, 0.558]])
-	x0 = torch.tensor([[0.1578, 0.558]])
+	
 	y0_obj, y0_cons = get_new_evals(x0,fun_obj,fun_cons)
 
 	# Define prior:
@@ -56,9 +70,9 @@ def one_experiment(my_seed):
 
 	# Initialize Safeopt using the gp_classi object, i.e., a GPy.models.GPClassification model, 
 	# while Safeopt actually expects a GPy.models.GPRegression model:
-	bounds = [[0.0, 1.0],[0.0,1.0]]
-	parameter_set = linearly_spaced_combinations(bounds=bounds,num_samples=100)
-	opt = SafeOpt([gp_obj,gp_cons], parameter_set, fmin=[-float("Inf"), 0.])
+	bounds = [[0.0, 1.0]]*dim
+	parameter_set = linearly_spaced_combinations(bounds=bounds,num_samples=Nsamples)
+	opt = SafeOpt([gp_obj,gp_cons], parameter_set, fmin=[-float("Inf"), 0.], beta=beta_par)
 
 	# print("opt.beta:",opt.beta(opt.gp.X.shape[0]))
 
@@ -87,23 +101,19 @@ def one_experiment(my_seed):
 
 	x_best, y_obj_best = opt.get_maximum()
 
-	# print("x_best:",x_best)
-	# print("y_obj_best:",y_obj_best)
-	# print("x_evals:",x_evals)
-	# print("y_obj:",y_obj)
-	# print("y_cons:",y_cons)
-
-	regret = 98. - y_obj_best
+	regret = y_opt - y_obj_best
 
 	return regret
 
 
 if __name__ == "__main__":
 
-	Nexp = 100
+	Nexp = 2
 	regret_vec = np.zeros(Nexp)
+	# which_obj = "eggs2D"
+	which_obj = "hart6D"
 	for ii in range(Nexp):
-		regret_vec[ii] = one_experiment(my_seed=ii)
+		regret_vec[ii] = one_experiment(my_seed=ii,which_obj=which_obj)
 		print("regret:",regret_vec[ii])
 
 	regret_mean = np.mean(regret_vec)
