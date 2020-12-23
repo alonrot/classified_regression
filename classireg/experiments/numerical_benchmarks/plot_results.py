@@ -644,12 +644,12 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 				perc_safe_evals_mean_all[j,i] = perc_safe_evals_mean
 				perc_safe_evals_std_all[j,i] = perc_safe_evals_std
 
-				if list_algo[i] != "EIC_standard":
-					regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
-					regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
-				else:
+				if list_algo[i] == "EIC_standard":
 					regret_mean_list_algo[j,i] = regret_simple_mean[-1]
 					regret_std_list_algo[j,i] = regret_simple_std[-1]					
+				else:
+					regret_mean_list_algo[j,i] = regret_simple_mean[Ncut-1]
+					regret_std_list_algo[j,i] = regret_simple_std[Ncut-1]
 
 			if list_algo[i] == "EIC": # EIC is actually EIC2
 				thres_mean_EIC_obj = threshold_mean[Ncut-1]
@@ -693,6 +693,10 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	# Colors:
 	color_list = plt.cm.Set2(np.arange(Nalgos-1,-1,-1))
 
+	# Revert sequence:
+	color_list = color_list[::-1]
+	color_list[0:4,:] = color_list[-4:-8:-1,:]
+
 	if Nalgos > 1:
 		bar_center_points = np.linspace(-(Nalgos-1)*width/2,+(Nalgos-1)*width/2,Nalgos)
 	else:
@@ -723,7 +727,7 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 	hdl_splot_regret.text(x=xx[-1]+bar_center_points[6],y=1.55,s="4.867",ha="center",fontweight="bold")
 
 	# Plot threshold:
-	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[Nalgos-1,:])
+	hdl_splot_thres.bar(xx, thres_mean_list_objs, width, align='center', tick_label=[""]*Nobj_funs, yerr=thres_std_list_objs, capsize=5.0, color=color_list[3,:])
 	# hdl_splot_thres.axhline(y=0.0, color="black", linewidth=1)
 	hdl_splot_thres.set_ylabel(r"Threshold $\hat{c}$", fontsize=fontsize_labels)
 	hdl_splot_thres.set_xticks(xx)
