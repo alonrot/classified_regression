@@ -123,7 +123,7 @@ class GPmodel(ExactGP, GPyTorchModel):
 
 		self._update_hyperparameters()
 
-		pdb.set_trace()
+		# pdb.set_trace()
 
 		self.eval()
 

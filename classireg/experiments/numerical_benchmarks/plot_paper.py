@@ -70,7 +70,7 @@ def main(cfg: DictConfig):
 	x_next, alpha_next = eic.get_next_point()
 
 
-	hdl_fig = plt.figure(figsize=(16, 10))
+	hdl_fig = plt.figure(figsize=(20, 10))
 	# hdl_fig.suptitle("Bayesian optimization with unknown constraint and threshold")
 	grid_size = (3,1)
 	axes_GPobj  = plt.subplot2grid(grid_size, (0,0), rowspan=1,fig=hdl_fig)

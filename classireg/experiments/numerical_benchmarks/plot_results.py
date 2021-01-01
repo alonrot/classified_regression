@@ -620,8 +620,8 @@ def plot_bars(load_from_file_selector=False,get_log_data=False,save_plot=False,b
 
 			elif list_algo[i] == "SafeOpt" and obj_fun_list[j] == "eggs2D":
 
-				regret_mean_list_algo[j,i] = 18.963873918843664
-				regret_std_list_algo[j,i] = 0.007407372403685516
+				regret_mean_list_algo[j,i] = 18.963873918843664 # Calculated in a safeopt wrapper; pasted the results herein directly
+				regret_std_list_algo[j,i] = 0.007407372403685516 # Calculated in a safeopt wrapper; pasted the results herein directly
 
 			elif list_algo[i] == "SafeOpt":
 				pass
