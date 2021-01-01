@@ -82,7 +82,7 @@ def get_initial_evaluations(which_objective,function_obj,function_cons,cfg_Ninit
         train_x = torch.tensor([[0.2,0.2,0.6666666666666666,0.6666666666666666,1.0]]) # Correpsonds to 29.07.2020
 
     if which_objective == "eggs2D":
-        train_x = torch.Tensor([[0.5578, 0.0558]])
+        train_x = torch.Tensor([[0.1578, 0.558]])
 
     if which_objective == "walker":
         # train_x = torch.tensor([[0.5  ,0.25, 0.5,  0.25, 0.5,  0.75]]) + 0.12*torch.randn(6) # Found with brute force, x_in \in 10**[-0.5,0.5], multiplicative; Stable 94 / 100

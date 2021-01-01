@@ -79,6 +79,17 @@ The hyperprior distribution for the hyperparameters, and other parameter choices
 ```
 under the `gpcr_model` structure. The `beta` and `gamma` distributions are parametrized according to the Python library `scipy.stats`. See a detailed description of the implementation of the [beta](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html) and [gamma](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gamma.html) distributions.
 
+Running SafeOpt and PIBU
+========================
+In the paper, we compare against these two popular BOC methods. We have included such comparisons in the code. They can be found in
+```bash
+<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/pibu/
+```
+and
+```bash
+<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/run_safeopt.py
+```
+
 General comments
 ================
 
