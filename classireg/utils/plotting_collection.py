@@ -314,7 +314,7 @@ def plotting_tool_cons(gp_obj,gp_cons,acqui,axes_GPobj,axes_GPcons,axes_GPcons_p
 
   return axes_GPobj, axes_GPcons, axes_GPcons_prob, axes_acqui
 
-def plotting_tool_uncons(gp,acqui,axes_GPobj,axes_acqui,Ndiv=201,xnext=None,alpha_next=None,save_fig=False,block=False):
+def plotting_tool_uncons(gp,acqui,axes_GPobj,axes_acqui,Ndiv=201,xnext=None,alpha_next=None,save_fig=False,block=False,plot_eta=True):
 
     if gp.dim > 1:
         return None, None
@@ -336,7 +336,7 @@ def plotting_tool_uncons(gp,acqui,axes_GPobj,axes_acqui,Ndiv=201,xnext=None,alph
         axes_GPobj = gp.plot(title="Objective f(x)",block=False,axes=axes_GPobj,plotting=True,legend=False,Ndiv=Ndiv,Nsamples=3,ylim=ylim,showtickslabels_x=False)
         if "threshold" in dir(gp):
 	        axes_GPobj.plot([0,1],np.ones(2)*gp.threshold.item(),linestyle="--",color="mediumpurple",linewidth=1.0,label="threshold")
-        if "x_eta" in dir(acqui):
+        if "x_eta" in dir(acqui) and plot_eta == True:
 	        axes_GPobj.plot(acqui.x_eta.squeeze().detach().cpu().numpy(),acqui.eta.squeeze().detach().cpu().numpy(),
                     marker="v",markersize=6,color="darkgreen",linestyle="None",label="min_x mu(x|D)")
         axes_GPobj.set_xticks([])

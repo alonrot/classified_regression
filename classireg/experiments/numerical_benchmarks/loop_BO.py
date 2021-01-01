@@ -54,7 +54,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
 
     # Plotting:
     if cfg.plot.plotting:
-        axes_GPobj, axes_acqui = plotting_tool_uncons(gp_obj,ei,axes_GPobj=None,axes_acqui=None)
+        axes_GPobj, axes_acqui = plotting_tool_uncons(gp_obj,ei,axes_GPobj=None,axes_acqui=None,plot_eta=False)
 
     # Label:
     label_cons = train_yl_cons[:,1]
@@ -84,7 +84,7 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
                 break
 
             if cfg.plot.plotting:
-                axes_GPobj, axes_acqui = plotting_tool_uncons(gp_obj,ei,axes_GPobj,axes_acqui,xnext=x_next,alpha_next=alpha_next,Ndiv=201)
+                axes_GPobj, axes_acqui = plotting_tool_uncons(gp_obj,ei,axes_GPobj,axes_acqui,xnext=x_next,alpha_next=alpha_next,Ndiv=201,plot_eta=False)
 
             # Collect evaluation at xnext:
             y_new_obj   = function_obj(x_next,with_noise=cfg.with_noise)

@@ -1,19 +1,23 @@
 Description
 =========
-This python package `classified_regression` contains the EIC2 framework described in the paper submission "Robot Learning with Crash Constraints". The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint thresold from data.
+This python package, `classified_regression`, deploys the EIC2 framework described in the following paper:
+
+> Robot Learning with Crash Constraints
+> Alonso Marco, Dominik Baumann, Majid Khadiv, Philipp Hennig, Ludovic Righetti and Sebastian Trimpe
+> https://arxiv.org/abs/2010.08669
+> Status: Under review
+
+The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint thresold from data.
 
 
 Requirements
 ============
 
-The algorithm runs in Python >= 3.7, and is developed under [BoTorch](https://botorch.org/).
+The algorithm runs in Python >= 3.7, and is developed under [BoTorch](https://botorch.org/). [BoTorch](https://botorch.org/) is a flexible framework for developing new Bayesian optimization algorithms. It builts on [Pytorch](https://pytorch.org/) and uses [scipy Python optimizers](https://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html) for GP model fitting and acquisition function optimization. 
 
 > If your python installation does not meet the minimum requirement, we recommend creating a virtual environment with the required python version. For example, [Anaconda](https://www.anaconda.com/distribution/) allows this, and does not interfere with your system-wide Python installation underneath. 
 
-> NOTE: We recommend opening this README.md file in an online Markdown editor, e.g., [StackEdit](https://stackedit.io/app#), for better readability.
-
-[BoTorch](https://botorch.org/) is a flexible framework for developing new Bayesian optimization algorithms. It builts on [Pytorch](https://pytorch.org/) and uses [scipy Python optimizers](https://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html) for GP model fitting and acquisition function optimization. 
-
+> NOTE: We recommend opening this README.md file in an online Markdown editor/viewer, e.g., [StackEdit](https://stackedit.io/app#), for better readability.
 
 Installation 
 ============
@@ -24,7 +28,7 @@ python --version
 ```
 2. Install the following dependencies
 ```bash
-pip install numpy botorch matplotlib pyyaml hydra-core==0.11.3 nlopt==2.6.2
+pip install numpy botorch==0.3.0 matplotlib pyyaml hydra-core==0.11.3 nlopt==2.6.2
 ```
 3. Clone this repository to your desired path:
 ```bash

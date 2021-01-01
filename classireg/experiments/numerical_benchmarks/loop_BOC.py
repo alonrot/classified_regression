@@ -169,7 +169,8 @@ def run(cfg: DictConfig, rep_nr: int, path2data=None) -> None:
     # Plotting:
     if cfg.plot.plotting:
         axes_GPobj, axes_GPcons, axes_GPcons_prob, axes_acqui = plotting_tool_cons(gp_obj,gp_cons,eic,axes_GPobj=None,axes_GPcons=None,
-                                                                                    axes_GPcons_prob=None,axes_acqui=None,cfg_plot=cfg.plot)
+                                                                                    axes_GPcons_prob=None,axes_acqui=None,cfg_plot=cfg.plot,
+                                                                                    plot_eta_c=False)
 
     try:
         for trial in range(trial_init,cfg.NBOiters):
@@ -193,7 +194,8 @@ def run(cfg: DictConfig, rep_nr: int, path2data=None) -> None:
             if cfg.plot.plotting:
                 axes_GPobj, axes_GPcons, axes_GPcons_prob, axes_acqui = plotting_tool_cons(gp_obj,gp_cons,eic,axes_GPobj,axes_GPcons,
                                                                                             axes_GPcons_prob,axes_acqui,cfg.plot,
-                                                                                            xnext=x_next,alpha_next=alpha_next)
+                                                                                            xnext=x_next,alpha_next=alpha_next,
+                                                                                            plot_eta_c=False)
 
             # Logging:
             append_logging_variables(logvars,eic.eta_c,eic.x_eta_c,x_next,alpha_next,regret_simple,gp_cons.threshold)

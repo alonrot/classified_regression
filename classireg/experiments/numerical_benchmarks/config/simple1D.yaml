@@ -81,7 +81,7 @@ plot:
   block: False
   Ndiv: 201
 
-NBOiters: 5
+NBOiters: 8
 which_objective: "simple1D"
 Nrep: 1
 with_noise: False
