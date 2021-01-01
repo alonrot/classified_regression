@@ -50,7 +50,7 @@ python run_experiments.py
 
 The algorithm is initialized with two points, randomly sampled within the domain.
 
-Several verbose messages should be shown in the terminal, as the algorithm progresses. In addition, a plot similar to Fig. 2 in the paper should pop up (see the figure below), depicting the objective f, the constraint, the probability of constraint satifsfaction (omitted in the paper due to space constraints, but computable via eq. (9) in the paper), and the acquisition function (expected improvement with constraints).
+Several verbose messages should be shown in the terminal, as the algorithm progresses. In addition, a plot similar to Fig. 2 in the paper should pop up (see the figure below), depicting the objective f, the constraint, the probability of constraint satisfaction (omitted in the paper due to space constraints, but computable via eq. (9) in the paper), and the acquisition function (expected improvement with constraints).
 
 ![1D example](pic_1D_example.png)
 
