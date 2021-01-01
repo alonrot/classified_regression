@@ -406,9 +406,9 @@ class GPCRmodel(BatchedMultiOutputGPyTorchModel,GP):
 																																																			verbosity=False)
 				if len(nearest_points_to_X_sta_i) > 0: 
 					str_banner = "<<<< Will modify the noise matrix >>>>"
-					logger.info("="*len(str_banner))
-					logger.info(str_banner)
-					logger.info("="*len(str_banner))
+					# logger.info("="*len(str_banner))
+					# logger.info(str_banner)
+					# logger.info("="*len(str_banner))
 					Sigma1_diag = self._modify_noise_matrix(nearest_points_to_X_sta_i,Sigma1_diag,factor=self.factor_heteroscedastic_noise,verbosity=False)
 
 			mu1 = self.train_ys.cpu().numpy()

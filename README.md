@@ -54,6 +54,25 @@ Several verbose messages should be shown in the terminal, as the algorithm progr
 
 ![1D example](pic_1D_example.png)
 
+Running global optimization benchmarks
+======================================
+
+The file
+```bash
+<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/config.yaml
+```
+is a configuration file based on [Hydra](https://hydra.cc/), where the user can select the benchmark to be used. To run experiments using "Michalewicz 10D" as objective function, comment the line "- config: simple1D" and uncomment the line "- config: micha10D". By default, the used acquisition function is "acqui: "EIC"", which is our proposed algorithm EIC^2, where the constraint is modeled using the GPCR model. Once the above changes have been applied to the config file, run the code as:
+
+```bash
+cd <path/to/classified_regression>/classireg/experiments/numerical_benchmarks
+python run_experiments.py
+```
+
+A new folder will be created, containing the saved results at
+```bash
+<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/micha10D/EIC_results/<folder_name>/data_0.yaml
+```
+
 General comments
 ================
 
