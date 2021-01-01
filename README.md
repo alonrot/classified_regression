@@ -2,10 +2,12 @@ Description
 =========
 This python package, `classified_regression`, deploys the EIC2 framework described in the following paper:
 
-> Robot Learning with Crash Constraints
-> Alonso Marco, Dominik Baumann, Majid Khadiv, Philipp Hennig, Ludovic Righetti and Sebastian Trimpe
-> https://arxiv.org/abs/2010.08669
-> Status: Under review
+```
+Robot Learning with Crash Constraints
+Alonso Marco, Dominik Baumann, Majid Khadiv, Philipp Hennig, Ludovic Righetti and Sebastian Trimpe
+https://arxiv.org/abs/2010.08669
+Status: Under review
+```
 
 The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint threshold from data.
 
@@ -79,8 +81,8 @@ The hyperprior distribution for the hyperparameters, and other parameter choices
 ```
 under the `gpcr_model` structure. The `beta` and `gamma` distributions are parametrized according to the Python library `scipy.stats`. See a detailed description of the implementation of the [beta](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html) and [gamma](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gamma.html) distributions.
 
-Running SafeOpt and PIBU
-========================
+### Running SafeOpt and PIBU
+
 In the paper, we compare against these two popular BOC methods. We have included such comparisons in the code. They can be found in
 ```bash
 <path/to/classified_regression>/classireg/experiments/numerical_benchmarks/pibu/
