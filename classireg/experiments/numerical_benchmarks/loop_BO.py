@@ -127,15 +127,6 @@ def run(cfg: DictConfig, rep_nr: int) -> None:
             # Update the model in other classes:
             ei = ExpectedImprovementVanilla(model=gp_obj, options=cfg.acquisition_function)
 
-            # if torch.any(label_cons == +1): # If we've found a stable evaluation, stop:
-            #     print("DEBUG (!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!)")
-            #     print("First stable evaluation found (!!!!!!)")
-            #     print("Stable parameterization Y:",train_y_obj_new[label_cons == +1])
-            #     print("Stable parameterization X:",train_x_obj_new[label_cons == +1,:])
-            #     print("ei.x_eta:",ei.x_eta)
-            #     print("ei.eta:",ei.eta)
-            #     pdb.set_trace()
-
             logvars["GPs"] = [gp_obj.logging(), None]
 
     except Exception as inst:

@@ -306,13 +306,4 @@ def run(cfg: DictConfig, rep_nr: int, path2data=None) -> None:
     logger.info("{0:s}".format(msg_bo_final))
     logger.info("="*len(msg_bo_final))
     logger.info("All data was saved during optimization in {0:s}".format(file2save))
-    logger.info("Final iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))
-
-    # node2write = convert_lists2arrays(logvars)
-    # node2write["n_rep"] = rep_nr
-    # node2write["ycm"] = f_min
-    # node2write["xcm"] = x_min
-    # # node2write["cfg"] = cfg # Do NOT save this, or yaml will terribly fail as it will have a cyclic graph!
-
-    # save_data(node2write=node2write,which_obj=cfg.which_objective,which_acqui=cfg.acqui,rep_nr=rep_nr)
-        
+    logger.info("Final iteration: {0:d} / {1:d}".format(trial+1,cfg.NBOiters))        
