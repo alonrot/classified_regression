@@ -1,13 +1,4 @@
-
-# Most of this code is taken from the GP classification example:
-# https://nbviewer.jupyter.org/github/SheffieldML/notebook/blob/master/GPy/basic_classification.ipynb
-
-# import matplotlib;matplotlib.rcParams['figure.figsize'] = (8,5)
-# import matplotlib;matplotlib.rcParams['text.usetex'] = True
-# import matplotlib;matplotlib.rcParams['font.size'] = 12
-# import matplotlib;matplotlib.rcParams['font.family'] = 'serif'
 import GPy
-# from GPy.models.gp_regression import GPRegression
 import numpy as np
 from matplotlib import pyplot as plt
 import pdb
