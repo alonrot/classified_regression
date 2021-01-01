@@ -7,13 +7,13 @@ This python package, `classified_regression`, deploys the EIC2 framework describ
 > https://arxiv.org/abs/2010.08669
 > Status: Under review
 
-The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint thresold from data.
+The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint threshold from data.
 
 
 Requirements
 ============
 
-The algorithm runs in Python >= 3.7, and is developed under [BoTorch](https://botorch.org/). [BoTorch](https://botorch.org/) is a flexible framework for developing new Bayesian optimization algorithms. It builts on [Pytorch](https://pytorch.org/) and uses [scipy Python optimizers](https://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html) for GP model fitting and acquisition function optimization. 
+The algorithm runs in Python >= 3.7, and is developed under [BoTorch](https://botorch.org/). [BoTorch](https://botorch.org/) is a flexible framework for developing new Bayesian optimization algorithms. It builds on [Pytorch](https://pytorch.org/) and uses [scipy Python optimizers](https://docs.scipy.org/doc/scipy/reference/tutorial/optimize.html) for GP model fitting and acquisition function optimization. 
 
 > If your python installation does not meet the minimum requirement, we recommend creating a virtual environment with the required python version. For example, [Anaconda](https://www.anaconda.com/distribution/) allows this, and does not interfere with your system-wide Python installation underneath. 
 
@@ -61,7 +61,7 @@ The file
 ```bash
 <path/to/classified_regression>/classireg/experiments/numerical_benchmarks/config.yaml
 ```
-is a configuration file based on [Hydra](https://hydra.cc/), where the user can select the benchmark to be used. To run experiments using "Michalewicz 10D" as objective function, comment the line "- config: simple1D" and uncomment the line "- config: micha10D". By default, the used acquisition function is "acqui: "EIC"", which is our proposed algorithm EIC^2, where the constraint is modeled using the GPCR model. Once the above changes have been applied to the config file, run the code as:
+is a configuration file based on [Hydra](https://hydra.cc/), where the user can select the benchmark to be used. To run experiments using `Michalewicz 10D` as objective function, comment the line `- config: simple1D` and uncomment the line `- config: micha10D`. By default, the used acquisition function is `acqui: EIC`, which is our proposed algorithm EIC^2, where the constraint is modeled using the GPCR model. Once the above changes have been applied to the config file, run the code as:
 
 ```bash
 cd <path/to/classified_regression>/classireg/experiments/numerical_benchmarks
@@ -73,11 +73,21 @@ A new folder will be created, containing the saved results at
 <path/to/classified_regression>/classireg/experiments/numerical_benchmarks/micha10D/EIC_results/<folder_name>/data_0.yaml
 ```
 
+The hyperprior distribution for the hyperparameters, and other parameter choices can be found in
+```bash
+<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/config/micha10D.yaml
+```
+under the `gpcr_model` structure. The `beta` and `gamma` distributions are parametrized according to the Python library `scipy.stats`. See a detailed description of the implementation of the [beta](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html) and [gamma](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gamma.html) distributions.
+
 General comments
 ================
 
  * All the hyperparameters are tunable and can be found in `<path/to/classified_regression>/classireg/experiments/numerical_benchmarks/config/simple1D.yaml`, and modified.
  * The first time any of the above algorithms are run, they can take a few seconds to start.
+ * The GPCR model is implemented in
+```bash
+<path/to/classified_regression>/classireg/models/gpcr_model.py
+```
 
 Known issues for macOS users
 ============================
