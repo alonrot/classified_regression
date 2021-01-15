@@ -102,8 +102,8 @@ General comments
 <path/to/classified_regression>/classireg/models/gpcr_model.py
 ```
 
-Known issues for macOS users
-============================
+Known issues
+============
  * If any of the aforementioned plots do not automatically pop up, try uncommenting line 3 in the file `<path/to/classified_regression>/classireg/utils/plotting_collection.py`
 ```python
 matplotlib.use('TkAgg') # Solves a no-plotting issue for macOS users
