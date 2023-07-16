@@ -1,16 +1,16 @@
 Description
 =========
-This python package, `classified_regression`, deploys the EIC2 framework described in the following paper:
-
+`classified_regression` is a machine learning framework to learn controller parameters on real robots, considering failures as a source of knowledge rather than something to avoid at all costs. We use constrained Bayesian optimization as a data-efficient tool to learn both, the controller parameters and the failure regions. Our novel Gaussian process, representing the reward function, treats failures as a binary observation and combines them with real-valued rewards through a hybrid dataset. The versatility of this software package is demonstrated in our paper [Robot Learning with Crash Constraints](https://arxiv.org/abs/2010.08669), where a real quadruped learns its own gains to jump as high as possible while minimizing failures.
 ```
 Robot Learning with Crash Constraints
 Alonso Marco, Dominik Baumann, Majid Khadiv, Philipp Hennig, Ludovic Righetti and Sebastian Trimpe
-https://arxiv.org/abs/2010.08669
-Status: Under review
+2021 IEEE Robotics and Automation Letters, 6(2), pp.1439-1446.
 ```
 
-The user can run a 1D example where the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint threshold from data.
-
+In this package you'll find:
+1. Toy examples that illustrate the framework
+2. Code to reproduce the benchmark results from the paper
+3. Our implementation of related algorithms we compare against in the paper
 
 Requirements
 ============
@@ -49,6 +49,7 @@ Running a 1D example
 cd <path/to/classified_regression>/classireg/experiments/numerical_benchmarks
 python run_experiments.py
 ```
+In this example, the algorithm finds the optimum on a constrained minimization problem with a single constraint. The objective f to be minimized is modeled with a standard GP. The constraint g is modeled with GPCR, i.e., the novel GP model proposed in this paper. Such model handles a hybrid set of observations: discrete labels (failure/success) and continuous values (obtained only upon success) and also estimates the constraint threshold from data.
 
 The algorithm is initialized with two points, randomly sampled within the domain.
 
